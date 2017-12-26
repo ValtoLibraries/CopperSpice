@@ -20,6 +20,7 @@
 *
 ***********************************************************************/
 
+#include <algorithm>
 #include <qtreewidget.h>
 
 #ifndef QT_NO_TREEWIDGET
@@ -628,7 +629,7 @@ void QTreeModel::ensureSorted(int column, Qt::SortOrder order,
    }
 
    LessThan compare = (order == Qt::AscendingOrder ? &itemLessThan : &itemGreaterThan);
-   qStableSort(sorting.begin(), sorting.end(), compare);
+   std::stable_sort(sorting.begin(), sorting.end(), compare);
 
    QModelIndexList oldPersistentIndexes;
    QModelIndexList newPersistentIndexes;
@@ -729,9 +730,10 @@ QList<QTreeWidgetItem *>::iterator QTreeModel::sortedInsertionIterator(
    Qt::SortOrder order, QTreeWidgetItem *item)
 {
    if (order == Qt::AscendingOrder) {
-      return qLowerBound(begin, end, item, QTreeModelLessThan());
+      return std::lower_bound(begin, end, item, QTreeModelLessThan());
    }
-   return qLowerBound(begin, end, item, QTreeModelGreaterThan());
+
+   return std::lower_bound(begin, end, item, QTreeModelGreaterThan());
 }
 
 QStringList QTreeModel::mimeTypes() const
@@ -873,7 +875,7 @@ void QTreeModel::sortItems(QList<QTreeWidgetItem *> *items, int column, Qt::Sort
 
    // do the sorting
    LessThan compare = (order == Qt::AscendingOrder ? &itemLessThan : &itemGreaterThan);
-   qStableSort(sorting.begin(), sorting.end(), compare);
+   std::stable_sort(sorting.begin(), sorting.end(), compare);
 
    QModelIndexList fromList;
    QModelIndexList toList;
@@ -3003,7 +3005,7 @@ void QTreeWidget::sortItems(int column, Qt::SortOrder order)
 /*!
     \internal
 
-    ### Qt 5: remove
+    ### Qt5: remove
 */
 void QTreeWidget::setSortingEnabled(bool enable)
 {
@@ -3013,7 +3015,7 @@ void QTreeWidget::setSortingEnabled(bool enable)
 /*!
     \internal
 
-    ### Qt 5: remove
+    ### Qt5: remove
 */
 bool QTreeWidget::isSortingEnabled() const
 {

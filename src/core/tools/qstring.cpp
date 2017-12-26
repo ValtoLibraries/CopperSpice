@@ -3520,41 +3520,7 @@ QString QString::toUpper() const
    return *this;
 }
 
-// ### Qt 5: Consider whether this function shouldn't be removed See task 202871.
-/*!
-    Safely builds a formatted string from the format string \a cformat
-    and an arbitrary list of arguments.
-
-    The %lc escape sequence expects a unicode character of type ushort
-    (as returned by QChar::unicode()). The %ls escape sequence expects
-    a pointer to a zero-terminated array of unicode characters of type
-    ushort (as returned by QString::utf16()).
-
-    \note This function expects a UTF-8 string for %s and Latin-1 for
-    the format string.
-
-    The format string supports most of the conversion specifiers
-    provided by printf() in the standard C++ library. It doesn't
-    honor the length modifiers (e.g. \c h for \c short, \c ll for
-    \c{long long}). If you need those, use the standard snprintf()
-    function instead:
-
-    \snippet doc/src/snippets/qstring/main.cpp 63
-
-    \warning We do not recommend using QString::sprintf() in new Qt
-    code. Instead, consider using QTextStream or arg(), both of
-    which support Unicode strings seamlessly and are type-safe.
-    Here's an example that uses QTextStream:
-
-    \snippet doc/src/snippets/qstring/main.cpp 64
-
-    For \l {QObject::tr()}{translations}, especially if the strings
-    contains more than one escape sequence, you should consider using
-    the arg() function instead. This allows the order of the
-    replacements to be controlled by the translator.
-
-    \sa arg()
-*/
+// ### Qt5: remove
 
 QString &QString::sprintf(const char *cformat, ...)
 {
@@ -4356,7 +4322,7 @@ float QString::toFloat(bool *ok) const
 /*!
     \overload
 */
-QString &QString::setNum(qlonglong n, int base)
+QString &QString::setNum(qint64 n, int base)
 {
 #if defined(QT_CHECK_RANGE)
    if (base < 2 || base > 36) {
@@ -4373,7 +4339,7 @@ QString &QString::setNum(qlonglong n, int base)
 /*!
     \overload
 */
-QString &QString::setNum(qulonglong n, int base)
+QString &QString::setNum(quint64 n, int base)
 {
 #if defined(QT_CHECK_RANGE)
    if (base < 2 || base > 36) {
@@ -4519,7 +4485,7 @@ QString QString::number(uint n, int base)
 /*!
     \overload
 */
-QString QString::number(qlonglong n, int base)
+QString QString::number(qint64 n, int base)
 {
    QString s;
    s.setNum(n, base);
@@ -4529,7 +4495,7 @@ QString QString::number(qlonglong n, int base)
 /*!
     \overload
 */
-QString QString::number(qulonglong n, int base)
+QString QString::number(quint64 n, int base)
 {
    QString s;
    s.setNum(n, base);
@@ -5145,7 +5111,7 @@ QString QString::arg(const QString &a, int fieldWidth, QChar fillChar) const
   used. For negative numbers, zero padding might appear before the
   minus sign.
 */
-QString QString::arg(qlonglong a, int fieldWidth, int base, QChar fillChar) const
+QString QString::arg(qint64 a, int fieldWidth, int base, QChar fillChar) const
 {
    ArgEscapeData d = findArgEscapes(*this);
 
@@ -5194,7 +5160,7 @@ QString QString::arg(qlonglong a, int fieldWidth, int base, QChar fillChar) cons
   used. For negative numbers, zero padding might appear before the
   minus sign.
 */
-QString QString::arg(qulonglong a, int fieldWidth, int base, QChar fillChar) const
+QString QString::arg(quint64 a, int fieldWidth, int base, QChar fillChar) const
 {
    ArgEscapeData d = findArgEscapes(*this);
 

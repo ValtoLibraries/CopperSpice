@@ -64,9 +64,10 @@
 #include <qshortcutmap_p.h>
 #include <qkeysequence.h>
 
-#define ACCEL_KEY(k) (!qApp->d_func()->shortcutMap.hasShortcutForKeySequence(k) ? QLatin1Char('\t') + QString(QKeySequence(k)) : QString())
+#define ACCEL_KEY(k)   (! qApp->d_func()->shortcutMap.hasShortcutForKeySequence(k) ?  \
+                        QLatin1Char('\t') + QKeySequence(k).toString(QKeySequence::NativeText) : QString())
 #else
-#define ACCEL_KEY(k) QString()
+#define ACCEL_KEY(k)   QString()
 #endif
 
 #include <limits.h>
@@ -1491,7 +1492,7 @@ void QLineEdit::mouseReleaseEvent(QMouseEvent *e)
    if (QApplication::clipboard()->supportsSelection()) {
       if (e->button() == Qt::LeftButton) {
          d->control->copy(QClipboard::Selection);
-      } else if (!d->control->isReadOnly() && e->button() == Qt::MidButton) {
+      } else if (!d->control->isReadOnly() && e->button() == Qt::MiddleButton) {
          deselect();
          insert(QApplication::clipboard()->text(QClipboard::Selection));
       }

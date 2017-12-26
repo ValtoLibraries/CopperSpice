@@ -20,6 +20,8 @@
 *
 ***********************************************************************/
 
+#include <algorithm>
+
 #include <qsortfilterproxymodel.h>
 
 #ifndef QT_NO_SORTFILTERPROXYMODEL
@@ -449,16 +451,19 @@ void QSortFilterProxyModelPrivate::sort_source_rows(
    QVector<int> &source_rows, const QModelIndex &source_parent) const
 {
    Q_Q(const QSortFilterProxyModel);
+
    if (source_sort_column >= 0) {
       if (sort_order == Qt::AscendingOrder) {
          QSortFilterProxyModelLessThan lt(source_sort_column, source_parent, model, q);
-         qStableSort(source_rows.begin(), source_rows.end(), lt);
+         std::stable_sort(source_rows.begin(), source_rows.end(), lt);
       } else {
          QSortFilterProxyModelGreaterThan gt(source_sort_column, source_parent, model, q);
-         qStableSort(source_rows.begin(), source_rows.end(), gt);
+         std::stable_sort(source_rows.begin(), source_rows.end(), gt);
       }
-   } else { // restore the source model order
-      qStableSort(source_rows.begin(), source_rows.end());
+
+   } else {
+      // restore the source model order
+      std::stable_sort(source_rows.begin(), source_rows.end());
    }
 }
 
@@ -485,18 +490,22 @@ QVector<QPair<int, int > > QSortFilterProxyModelPrivate::proxy_intervals_for_sou
    while (source_items_index < source_items.size()) {
       int first_proxy_item = source_to_proxy.at(source_items.at(source_items_index));
       Q_ASSERT(first_proxy_item != -1);
+
       int last_proxy_item = first_proxy_item;
       ++source_items_index;
+
       // Find end of interval
       while ((source_items_index < source_items.size())
              && (source_to_proxy.at(source_items.at(source_items_index)) == last_proxy_item + 1)) {
          ++last_proxy_item;
          ++source_items_index;
       }
+
       // Add interval to result
       proxy_intervals.append(QPair<int, int>(first_proxy_item, last_proxy_item));
    }
-   qStableSort(proxy_intervals.begin(), proxy_intervals.end());
+
+   std::stable_sort(proxy_intervals.begin(), proxy_intervals.end());
    return proxy_intervals;
 }
 
@@ -1972,7 +1981,7 @@ bool QSortFilterProxyModel::removeRows(int row, int count, const QModelIndex &pa
    for (int i = row; i < row + count; ++i) {
       rows.append(m->source_rows.at(i));
    }
-   qSort(rows.begin(), rows.end());
+   std::sort(rows.begin(), rows.end());
 
    int pos = rows.count() - 1;
    bool ok = true;

@@ -325,17 +325,21 @@ void QMenuPrivate::updateActionRects(const QRect &screen) const
          } else {
             QString s = action->text();
             int t = s.indexOf(QLatin1Char('\t'));
+
             if (t != -1) {
                tabWidth = qMax(int(tabWidth), qfm.width(s.mid(t + 1)));
                s = s.left(t);
+
 #ifndef QT_NO_SHORTCUT
             } else {
                QKeySequence seq = action->shortcut();
-               if (!seq.isEmpty()) {
-                  tabWidth = qMax(int(tabWidth), qfm.width(seq));
+
+               if (! seq.isEmpty()) {
+                  tabWidth = qMax(int(tabWidth), qfm.width(seq.toString(QKeySequence::NativeText)));
                }
 #endif
             }
+
             sz.setWidth(fm.boundingRect(QRect(), Qt::TextSingleLine | Qt::TextShowMnemonic, s).width());
             sz.setHeight(qMax(fm.height(), qfm.height()));
 
@@ -1302,14 +1306,18 @@ void QMenu::initStyleOption(QStyleOptionMenuItem *option, const QAction *action)
    if (action->isIconVisibleInMenu()) {
       option->icon = action->icon();
    }
+
    QString textAndAccel = action->text();
+
 #ifndef QT_NO_SHORTCUT
    if (textAndAccel.indexOf(QLatin1Char('\t')) == -1) {
       QKeySequence seq = action->shortcut();
+
       if (!seq.isEmpty()) {
-         textAndAccel += QLatin1Char('\t') + QString(seq);
+         textAndAccel += QLatin1Char('\t') + seq.toString(QKeySequence::NativeText);
       }
    }
+
 #endif
    option->text = textAndAccel;
    option->tabWidth = d->tabWidth;
@@ -2070,6 +2078,7 @@ QAction *QMenu::exec(const QPoint &p, QAction *action)
 
    QPointer<QObject> guard = this;
    (void) eventLoop.exec();
+
    if (guard.isNull()) {
       return 0;
    }
@@ -2080,58 +2089,11 @@ QAction *QMenu::exec(const QPoint &p, QAction *action)
    return action;
 }
 
-/*!
-    \overload
-
-    Executes a menu synchronously.
-
-    The menu's actions are specified by the list of \a actions. The menu will
-    pop up so that the specified action, \a at, appears at global position \a
-    pos. If \a at is not specified then the menu appears at position \a
-    pos. \a parent is the menu's parent widget; specifying the parent will
-    provide context when \a pos alone is not enough to decide where the menu
-    should go (e.g., with multiple desktops or when the parent is embedded in
-    QGraphicsView).
-
-    The function returns the triggered QAction in either the popup
-    menu or one of its submenus, or 0 if no item was triggered
-    (normally because the user pressed Esc).
-
-    This is equivalent to:
-    \snippet doc/src/snippets/code/src_gui_widgets_qmenu.cpp 6
-
-    \sa popup(), QWidget::mapToGlobal()
-*/
-QAction *QMenu::exec(QList<QAction *> actions, const QPoint &pos, QAction *at, QWidget *parent)
+QAction *QMenu::exec(const QList<QAction *> &actions, const QPoint &pos, QAction *at, QWidget *parent)
 {
    QMenu menu(parent);
    menu.addActions(actions);
    return menu.exec(pos, at);
-}
-
-/*!
-    \overload
-
-    Executes a menu synchronously.
-
-    The menu's actions are specified by the list of \a actions. The menu
-    will pop up so that the specified action, \a at, appears at global
-    position \a pos. If \a at is not specified then the menu appears
-    at position \a pos.
-
-    The function returns the triggered QAction in either the popup
-    menu or one of its submenus, or 0 if no item was triggered
-    (normally because the user pressed Esc).
-
-    This is equivalent to:
-    \snippet doc/src/snippets/code/src_gui_widgets_qmenu.cpp 6
-
-    \sa popup(), QWidget::mapToGlobal()
-*/
-QAction *QMenu::exec(QList<QAction *> actions, const QPoint &pos, QAction *at)
-{
-   // ### Qt 5: merge
-   return exec(actions, pos, at, 0);
 }
 
 /*!

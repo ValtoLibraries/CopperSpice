@@ -20,9 +20,4 @@
 *
 ***********************************************************************/
 
-#ifndef QConfig_H
-#define QConfig_H
-
-/* This file does not disable any qt functionality */
-
-#endif
+#include <qflatmap.h>

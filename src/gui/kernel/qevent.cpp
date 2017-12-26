@@ -307,7 +307,7 @@ QMouseEventEx::~QMouseEventEx()
 
     Returns the button state when the event was generated. The button
     state is a combination of Qt::LeftButton, Qt::RightButton,
-    Qt::MidButton using the OR operator. For mouse move events,
+    Qt::MiddleButton using the OR operator. For mouse move events,
     this is all buttons that are pressed down. For mouse press and
     double click events this includes the button that caused the
     event. For mouse release events this excludes the button that
@@ -960,7 +960,7 @@ QFocusEvent::~QFocusEvent()
 {
 }
 
-// ### Qt 5: remove
+// ### Qt5: remove
 /*!
     \internal
  */
@@ -1414,7 +1414,7 @@ QContextMenuEvent::QContextMenuEvent(Reason reason, const QPoint &pos)
 
     The returned value is a selection of the following values,
     combined with the OR operator:
-    Qt::LeftButton, Qt::RightButton, Qt::MidButton,
+    Qt::LeftButton, Qt::RightButton, Qt::MiddleButton,
     Qt::ShiftButton, Qt::ControlButton, and Qt::AltButton.
 */
 
@@ -3205,7 +3205,7 @@ QClipboardEvent::~QClipboardEvent()
     Returns the key sequence that triggered the event.
 */
 
-// ### Qt 5: remove
+// ### Qt5: remove
 /*!
     \fn const QKeySequence &QShortcutEvent::key()
 
@@ -3221,7 +3221,7 @@ QClipboardEvent::~QClipboardEvent()
     \sa QShortcut::id()
 */
 
-// ### Qt 5: remove
+// ### Qt5: remove
 /*!
     \fn int QShortcutEvent::shortcutId()
     \overload
@@ -3238,7 +3238,7 @@ QClipboardEvent::~QClipboardEvent()
     \sa QShortcut::activatedAmbiguously()
 */
 
-// ### Qt 5: remove
+// ### Qt5: remove
 /*!
     \fn bool QShortcutEvent::isAmbiguous()
 

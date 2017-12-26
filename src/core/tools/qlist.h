@@ -23,20 +23,18 @@
 #ifndef QLIST_H
 #define QLIST_H
 
-#include <qalgorithms.h>
-
+#include <algorithm>
 #include <deque>
 #include <exception>
-#include <iterator>
 #include <initializer_list>
+#include <iterator>
 #include <list>
 #include <string>
 #include <stdexcept>
-
 #include <limits.h>
 #include <string.h>
 
-QT_BEGIN_NAMESPACE
+#include <qassert.h>
 
 template <typename T>
 class QSet;
@@ -283,7 +281,7 @@ class QList
 
    static QList<T> fromStdList(const std::list<T> &list) {
       QList<T> tmp;
-      qCopy(list.begin(), list.end(), std::back_inserter(tmp));
+      std::copy(list.begin(), list.end(), std::back_inserter(tmp));
       return tmp;
    }
 
@@ -719,7 +717,5 @@ class QMutableListIterator
          return false;
       }
 };
-
-QT_END_NAMESPACE
 
 #endif // QLIST_H

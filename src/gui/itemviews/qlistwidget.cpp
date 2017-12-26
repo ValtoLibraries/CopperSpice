@@ -20,6 +20,8 @@
 *
 ***********************************************************************/
 
+#include <algorithm>
+
 #include <qlistwidget.h>
 
 #ifndef QT_NO_LISTWIDGET
@@ -298,9 +300,11 @@ void QListModel::sort(int column, Qt::SortOrder order)
    }
 
    LessThan compare = (order == Qt::AscendingOrder ? &itemLessThan : &itemGreaterThan);
-   qSort(sorting.begin(), sorting.end(), compare);
+   std::sort(sorting.begin(), sorting.end(), compare);
+
    QModelIndexList fromIndexes;
    QModelIndexList toIndexes;
+
    for (int r = 0; r < sorting.count(); ++r) {
       QListWidgetItem *item = sorting.at(r).first;
       toIndexes.append(createIndex(r, 0, item));
@@ -333,7 +337,7 @@ void QListModel::ensureSorted(int column, Qt::SortOrder order, int start, int en
    }
 
    LessThan compare = (order == Qt::AscendingOrder ? &itemLessThan : &itemGreaterThan);
-   qSort(sorting.begin(), sorting.end(), compare);
+   std::sort(sorting.begin(), sorting.end(), compare);
 
    QModelIndexList oldPersistentIndexes = persistentIndexList();
    QModelIndexList newPersistentIndexes = oldPersistentIndexes;
@@ -400,9 +404,10 @@ QList<QListWidgetItem *>::iterator QListModel::sortedInsertionIterator(
    Qt::SortOrder order, QListWidgetItem *item)
 {
    if (order == Qt::AscendingOrder) {
-      return qLowerBound(begin, end, item, QListModelLessThan());
+      return std::lower_bound(begin, end, item, QListModelLessThan());
    }
-   return qLowerBound(begin, end, item, QListModelGreaterThan());
+
+   return std::lower_bound(begin, end, item, QListModelGreaterThan());
 }
 
 void QListModel::itemChanged(QListWidgetItem *item)
@@ -1851,7 +1856,7 @@ void QListWidget::dropEvent(QDropEvent *event)
          if (persIndexes.contains(topIndex)) {
             return;
          }
-         qSort(persIndexes); // The dropped items will remain in the same visual order.
+         std::sort(persIndexes.begin(), persIndexes.end()); // The dropped items will remain in the same visual order.
 
          QPersistentModelIndex dropRow = model()->index(row, col, topIndex);
 

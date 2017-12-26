@@ -54,15 +54,16 @@
 QT_BEGIN_NAMESPACE
 
 enum {
-   FIRST_YEAR = -4713,
+   FIRST_YEAR  = -4713,
    FIRST_MONTH = 1,
-   FIRST_DAY = 2,                // ### Qt 5: make FIRST_DAY = 1, by support jd == 0 as valid
-   SECS_PER_DAY = 86400,
-   MSECS_PER_DAY = 86400000,
-   SECS_PER_HOUR = 3600,
+   FIRST_DAY   = 2,
+
+   SECS_PER_DAY   = 86400,
+   MSECS_PER_DAY  = 86400000,
+   SECS_PER_HOUR  = 3600,
    MSECS_PER_HOUR = 3600000,
-   SECS_PER_MIN = 60,
-   MSECS_PER_MIN = 60000,
+   SECS_PER_MIN   = 60,
+   MSECS_PER_MIN  = 60000,
    JULIAN_DAY_FOR_EPOCH = 2440588 // result of julianDayFromGregorianDate(1970, 1, 1)
 };
 
@@ -111,8 +112,8 @@ static void getDateFromJulianDay(uint julianDay, int *year, int *month, int *day
    if (julianDay >= 2299161) {
       // Gregorian calendar starting from October 15, 1582
       // This algorithm is from Henry F. Fliegel and Thomas C. Van Flandern
-      qulonglong ell, n, i, j;
-      ell = qulonglong(julianDay) + 68569;
+      quint64 ell, n, i, j;
+      ell = quint64(julianDay) + 68569;
       n = (4 * ell) / 146097;
       ell = ell - (146097 * n + 3) / 4;
       i = (4000 * (ell + 1)) / 1461001;
@@ -791,9 +792,8 @@ bool QDate::isLeapYear(int y)
 /*!
     \internal
 
-    This function has a confusing name and shouldn't be part of the
-    API anyway, since we have toJulian() and fromJulian().
-    ### Qt 5: remove it
+    This function has a confusing name and should not be part of the API
+    we have toJulian() and fromJulian(). ### Qt5: remove it
 */
 uint QDate::gregorianToJulian(int y, int m, int d)
 {
@@ -803,9 +803,8 @@ uint QDate::gregorianToJulian(int y, int m, int d)
 /*!
     \internal
 
-    This function has a confusing name and shouldn't be part of the
-    API anyway, since we have toJulian() and fromJulian().
-    ### Qt 5: remove it
+    This function has a confusing name and should not be part of the API
+    we have toJulian() and fromJulian(). ### Qt5: remove it
 */
 void QDate::julianToGregorian(uint jd, int &y, int &m, int &d)
 {

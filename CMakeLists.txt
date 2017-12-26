@@ -28,7 +28,7 @@ endif()
 
 set(BUILD_MAJOR "1")
 set(BUILD_MINOR "4")
-set(BUILD_MICRO "3")
+set(BUILD_MICRO "4")
 set(BUILD_ABI ${BUILD_MAJOR}.${BUILD_MINOR})
 
 # required
@@ -198,9 +198,6 @@ set_package_properties(MySQL PROPERTIES
     URL "http://www.mysql.com"
     TYPE RECOMMENDED
 )
-
-# TODO: need a module for Platform Abstraction
-# find_package(QPA)
 
 if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     find_package(GTK2)

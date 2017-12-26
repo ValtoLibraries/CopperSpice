@@ -23,11 +23,11 @@
 #ifndef QDATETIME_H
 #define QDATETIME_H
 
-#include <QtCore/qstring.h>
-#include <QtCore/qnamespace.h>
-#include <QtCore/qsharedpointer.h>
+#include <qstring.h>
+#include <qnamespace.h>
+#include <qsharedpointer.h>
 
-QT_BEGIN_NAMESPACE
+class QDebug;
 
 class Q_CORE_EXPORT QDate
 {
@@ -243,7 +243,7 @@ class Q_CORE_EXPORT QDateTime
    explicit QDateTime(const QDate &);
    QDateTime(const QDate &, const QTime &, Qt::TimeSpec spec = Qt::LocalTime);
 
-   // ### Qt 6: Merge with above with default offsetSeconds = 0
+   // ### Qt5: Merge with above with default offsetSeconds = 0
    QDateTime(const QDate &date, const QTime &time, Qt::TimeSpec spec, int offsetSeconds);
    QDateTime(const QDateTime &other);
    ~QDateTime();
@@ -323,11 +323,11 @@ class Q_CORE_EXPORT QDateTime
 #endif
    static QDateTime fromTime_t(uint secs);
 
-   // ### Qt 6: Merge with above with default spec = Qt::LocalTime
+   // ### Qt5: Merge with above with default spec = Qt::LocalTime
    static QDateTime fromTime_t(uint secs, Qt::TimeSpec spec, int offsetFromUtc = 0);
    static QDateTime fromMSecsSinceEpoch(qint64 msecs);
 
-   // ### Qt 6: Merge with above with default spec = Qt::LocalTime
+   // ### Qt5: Merge with above with default spec = Qt::LocalTime
    static QDateTime fromMSecsSinceEpoch(qint64 msecs, Qt::TimeSpec spec, int offsetFromUtc = 0);
    static qint64 currentMSecsSinceEpoch();
 
@@ -359,6 +359,5 @@ Q_CORE_EXPORT QDebug operator<<(QDebug, const QTime &);
 Q_CORE_EXPORT QDebug operator<<(QDebug, const QDateTime &);
 #endif
 
-QT_END_NAMESPACE
 
 #endif // QDATETIME_H

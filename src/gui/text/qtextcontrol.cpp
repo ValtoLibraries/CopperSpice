@@ -31,7 +31,6 @@
 #include <qdebug.h>
 #include <qmime.h>
 #include <qdrag.h>
-#include <qconfig.h>
 #include <qclipboard.h>
 #include <qmenu.h>
 #include <qstyle.h>
@@ -68,11 +67,10 @@
 #include <qshortcutmap_p.h>
 #include <qkeysequence.h>
 
-#define ACCEL_KEY(k) (! qApp->d_func()->shortcutMap.hasShortcutForKeySequence(k) ? QLatin1Char('\t') + QString(QKeySequence(k)) : QString())
-
+#define ACCEL_KEY(k)   (! qApp->d_func()->shortcutMap.hasShortcutForKeySequence(k) ?  \
+                        QLatin1Char('\t') + QKeySequence(k).toString(QKeySequence::NativeText) : QString())
 #else
-#define ACCEL_KEY(k) QString()
-
+#define ACCEL_KEY(k)   QString()
 #endif
 
 QT_BEGIN_NAMESPACE
@@ -129,6 +127,7 @@ bool QTextControlPrivate::cursorMoveKeyEvent(QKeyEvent *e)
 #endif
 
    Q_Q(QTextControl);
+
    if (cursor.isNull()) {
       return false;
    }
@@ -139,9 +138,10 @@ bool QTextControlPrivate::cursorMoveKeyEvent(QKeyEvent *e)
    QTextCursor::MoveMode mode = QTextCursor::MoveAnchor;
    QTextCursor::MoveOperation op = QTextCursor::NoMove;
 
-   if (false) {
-   }
-#ifndef QT_NO_SHORTCUT
+#ifdef QT_NO_SHORTCUT
+  return false;
+
+#else
    if (e == QKeySequence::MoveToNextChar) {
       op = QTextCursor::Right;
    } else if (e == QKeySequence::MoveToPreviousChar) {
@@ -211,13 +211,17 @@ bool QTextControlPrivate::cursorMoveKeyEvent(QKeyEvent *e)
       op = QTextCursor::EndOfLine;
    } else if (e == QKeySequence::MoveToStartOfDocument) {
       op = QTextCursor::Start;
+
    } else if (e == QKeySequence::MoveToEndOfDocument) {
       op = QTextCursor::End;
-   }
-#endif // QT_NO_SHORTCUT
-   else {
+
+   } else {
       return false;
+
    }
+
+#endif // QT_NO_SHORTCUT
+
 
    // Except for pageup and pagedown, Mac OS X has very different behavior, we don't do it all, but
    // here's the breakdown:
@@ -257,7 +261,6 @@ bool QTextControlPrivate::cursorMoveKeyEvent(QKeyEvent *e)
    }
 
    selectionChanged(/*forceEmitSelectionChanged =*/(mode == QTextCursor::KeepAnchor));
-
    repaintOldAndNewSelection(oldSelection);
 
    return true;
@@ -1441,10 +1444,12 @@ static QRectF boundingRectOfFloatsInSelection(const QTextCursor &cursor)
    QTextFrame *frame = cursor.currentFrame();
    const QList<QTextFrame *> children = frame->childFrames();
 
-   const QList<QTextFrame *>::ConstIterator firstFrame = qLowerBound(children.constBegin(), children.constEnd(),
+   const QList<QTextFrame *>::ConstIterator firstFrame = std::lower_bound(children.constBegin(), children.constEnd(),
          cursor.selectionStart(), firstFramePosLessThanCursorPos);
-   const QList<QTextFrame *>::ConstIterator lastFrame = qUpperBound(children.constBegin(), children.constEnd(),
+
+   const QList<QTextFrame *>::ConstIterator lastFrame = std::upper_bound(children.constBegin(), children.constEnd(),
          cursor.selectionEnd(), cursorPosLessThanLastFramePos);
+
    for (QList<QTextFrame *>::ConstIterator it = firstFrame; it != lastFrame; ++it) {
       if ((*it)->frameFormat().position() != QTextFrameFormat::InFlow) {
          r |= frame->document()->documentLayout()->frameBoundingRect(*it);
@@ -1762,7 +1767,7 @@ void QTextControlPrivate::mouseReleaseEvent(QEvent *e, Qt::MouseButton button, c
 #ifndef QT_NO_CLIPBOARD
       setClipboardSelection();
       selectionChanged(true);
-   } else if (button == Qt::MidButton
+   } else if (button == Qt::MiddleButton
               && (interactionFlags & Qt::TextEditable)
               && QApplication::clipboard()->supportsSelection()) {
       setCursorPosition(pos);

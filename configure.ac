@@ -1,4 +1,4 @@
-AC_INIT([copperspice], [1.4.3], [info@copperspice.com])
+AC_INIT([copperspice], [1.4.4], [info@copperspice.com])
 
 # derive CS hex version from "@PACKAGE_VERSION@"
 HEX_VERSION=$(printf "0x%02x%02x%02x" `echo $PACKAGE_VERSION | tr '.' ' '`)
@@ -94,8 +94,11 @@ if test "$OSTYPE" == LINUX -o "$OSTYPE" == BSD; then
 PKG_CHECK_MODULES(FONTCONFIG, fontconfig, FONTCONFIG="yes", missing="$missing FontConfig")
 PKG_CHECK_MODULES(FREETYPE, freetype2, FREETYPE="yes", missing="$missing FreeType")
 PKG_CHECK_MODULES(GLIB, glib-2.0, GLIB="yes", missing="$missing GLIB")
+
+if test "x$enable_phonon" != "xno"; then
 PKG_CHECK_MODULES(GSTREAMER, gstreamer-0.10, GSTREAMER="yes", missing="$missing Gstreamer")
 PKG_CHECK_MODULES(GSTREAMER_AUDIO, gstreamer-audio-0.10, GSTREAMER_AUDIO="yes", missing="$missing Gstreamer-Plugins")
+fi
 
 # not mandatory
 PKG_CHECK_MODULES(GTK, gtk+-2.0, GTK="yes", true)
@@ -138,7 +141,6 @@ if test "x$missing" != "x"; then
    exit
 fi
 
-
 AM_CONDITIONAL(OSTYPE_WIN, test "$OSTYPE" == WIN)
 AM_CONDITIONAL(OSTYPE_LINUX, test "$OSTYPE" == LINUX)
 AM_CONDITIONAL(OSTYPE_DARWIN, test "$OSTYPE" == DARWIN)
@@ -148,8 +150,6 @@ AM_CONDITIONAL(X11, test "$OSTYPE" == LINUX -o "$OSTYPE" == BSD)
 AM_CONDITIONAL(COCOA, test "$OSTYPE" == DARWIN)
 
 AM_CONDITIONAL(CUPS, test "x$ac_cv_header_cups_cups_h" = x""yes)
-AM_CONDITIONAL(QPA, false)
-
 AM_CONDITIONAL(GTK, test "x$GTK" = x""yes -a "$OSTYPE" != DARWIN)
 
 #AM_CONDITIONAL(GLIB, test "x$GLIB" = x""yes)

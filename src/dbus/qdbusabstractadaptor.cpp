@@ -20,6 +20,7 @@
 *
 ***********************************************************************/
 
+#include <algorithm>
 #include "qdbusabstractadaptor.h"
 
 #include <QtCore/qcoreapplication.h>
@@ -189,11 +190,12 @@ void QDBusAdaptorConnector::addAdaptor(QDBusAbstractAdaptor *adaptor)
     int ciid = mo->indexOfClassInfo(QCLASSINFO_DBUS_INTERFACE);
     if (ciid != -1) {
         QMetaClassInfo mci = mo->classInfo(ciid);
+
         if (*mci.value()) {
             // find out if this interface exists first
             const char *interface = mci.value();
-            AdaptorMap::Iterator it = qLowerBound(adaptors.begin(), adaptors.end(),
-                                                  QByteArray(interface));
+            AdaptorMap::Iterator it = std::lower_bound(adaptors.begin(), adaptors.end(), QByteArray(interface));
+
             if (it != adaptors.end() && qstrcmp(interface, it->interface) == 0) {
                 // exists. Replace it (though it's probably the same)
                 if (it->adaptor != adaptor) {
@@ -242,7 +244,7 @@ void QDBusAdaptorConnector::polish()
     }
 
     // sort the adaptor list
-    qSort(adaptors);
+    std::sort(adaptors.begin(), adaptors.end());
 }
 
 void QDBusAdaptorConnector::relaySlot(void **argv)

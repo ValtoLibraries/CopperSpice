@@ -4334,7 +4334,7 @@ static Qt::MouseButtons translateMouseButtons(int s)
       ret |= Qt::LeftButton;
    }
    if (s & Button2Mask) {
-      ret |= Qt::MidButton;
+      ret |= Qt::MiddleButton;
    }
    if (s & Button3Mask) {
       ret |= Qt::RightButton;
@@ -4472,7 +4472,7 @@ bool QETWidget::translateMouseEvent(const XEvent *event)
             button = Qt::LeftButton;
             break;
          case Button2:
-            button = Qt::MidButton;
+            button = Qt::MiddleButton;
             break;
          case Button3:
             button = Qt::RightButton;
@@ -5832,7 +5832,7 @@ static void sm_performSaveYourself(QSessionManagerPrivate *smd)
    // generate a new session key
    timeval tv;
    gettimeofday(&tv, 0);
-   smd->sessionKey  = QString::number(qulonglong(tv.tv_sec)) + QLatin1Char('_') + QString::number(qulonglong(tv.tv_usec));
+   smd->sessionKey  = QString::number(quint64(tv.tv_sec)) + QLatin1Char('_') + QString::number(quint64(tv.tv_usec));
 
    QStringList arguments = qApp->arguments();
    QString argument0 = arguments.isEmpty() ? qApp->applicationFilePath() : arguments.at(0);

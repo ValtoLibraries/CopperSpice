@@ -20,6 +20,7 @@
 *
 ***********************************************************************/
 
+#include <algorithm>
 #include <qlistview.h>
 
 #ifndef QT_NO_LISTVIEW
@@ -1929,6 +1930,27 @@ int QCommonListViewBase::horizontalScrollToValue(const int /*index*/, QListView:
  * ListMode ListView Implementation
 */
 
+// internal only
+static inline int cs_vector_query(const QVector<int> &vector, int item, int start, int end)
+{
+   int i = (start + end + 1) >> 1;
+
+   while (end - start > 0) {
+      if (vector.at(i) > item)  {
+         end = i - 1;
+
+      }  else  {
+         start = i;
+
+      }
+
+      i = (start + end + 1) >> 1;
+   }
+
+   return i;
+}
+
+
 #ifndef QT_NO_DRAGANDDROP
 QAbstractItemView::DropIndicatorPosition QListModeViewBase::position(const QPoint &pos, const QRect &rect,
       const QModelIndex &index) const
@@ -2298,15 +2320,11 @@ bool QListModeViewBase::doBatchedItemLayout(const QListViewLayoutInfo &info, int
 
 QListViewItem QListModeViewBase::indexToListViewItem(const QModelIndex &index) const
 {
-   if (flowPositions.isEmpty()
-         || segmentPositions.isEmpty()
-         || index.row() >= flowPositions.count()) {
+   if (flowPositions.isEmpty() || segmentPositions.isEmpty() || index.row() >= flowPositions.count()) {
       return QListViewItem();
    }
 
-   const int segment = qBinarySearch<int>(segmentStartRows, index.row(),
-                                          0, segmentStartRows.count() - 1);
-
+   const int segment = cs_vector_query(segmentStartRows, index.row(), 0, segmentStartRows.count() - 1);
 
    QStyleOptionViewItemV4 options = viewOptions();
    options.rect.setSize(contentsSize);
@@ -2317,15 +2335,21 @@ QListViewItem QListModeViewBase::indexToListViewItem(const QModelIndex &index) c
    if (flow() == QListView::LeftToRight) {
       pos.setX(flowPositions.at(index.row()));
       pos.setY(segmentPositions.at(segment));
+
    } else { // TopToBottom
       pos.setY(flowPositions.at(index.row()));
       pos.setX(segmentPositions.at(segment));
-      if (isWrapping()) { // make the items as wide as the segment
+
+      if (isWrapping()) {
+         // make the items as wide as the segment
          int right = (segment + 1 >= segmentPositions.count()
                       ? contentsSize.width()
                       : segmentPositions.at(segment + 1));
+
          size.setWidth(right - pos.x());
-      } else { // make the items as wide as the viewport
+
+      } else {
+         // make the items as wide as the viewport
          size.setWidth(qMax(size.width(), viewport()->width() - 2 * spacing()));
       }
    }
@@ -2475,6 +2499,7 @@ void QListModeViewBase::doStaticLayout(const QListViewLayoutInfo &info)
    }
 }
 
+
 /*!
   \internal
   Finds the set of items intersecting with \a area.
@@ -2498,34 +2523,38 @@ QVector<QModelIndex> QListModeViewBase::intersectingSet(const QRect &area) const
       flowStartPosition = area.top();
       flowEndPosition = area.bottom();
    }
+
    if (segmentPositions.count() < 2 || flowPositions.isEmpty()) {
       return ret;
    }
+
    // the last segment position is actually the edge of the last segment
    const int segLast = segmentPositions.count() - 2;
-   int seg = qBinarySearch<int>(segmentPositions, segStartPosition, 0, segLast + 1);
+   int seg = cs_vector_query(segmentPositions, segStartPosition, 0, segLast + 1);
+
    for (; seg <= segLast && segmentPositions.at(seg) <= segEndPosition; ++seg) {
       int first = segmentStartRows.at(seg);
       int last = (seg < segLast ? segmentStartRows.at(seg + 1) : batchStartRow) - 1;
+
       if (segmentExtents.at(seg) < flowStartPosition) {
          continue;
       }
-      int row = qBinarySearch<int>(flowPositions, flowStartPosition, first, last);
+
+      int row = cs_vector_query(flowPositions, flowStartPosition, first, last );
+
       for (; row <= last && flowPositions.at(row) <= flowEndPosition; ++row) {
          if (isHidden(row)) {
             continue;
          }
+
          QModelIndex index = modelIndex(row);
          if (index.isValid()) {
             ret += index;
          }
-#if 0 // for debugging
-         else {
-            qWarning("intersectingSet: row %d was invalid", row);
-         }
-#endif
+
       }
    }
+
    return ret;
 }
 
@@ -2630,20 +2659,23 @@ int QListModeViewBase::perItemScrollToValue(int index, int scrollValue, int view
          default:
             break;
       }
-   } else { // wrapping
+   } else {
+      // wrapping
       Qt::Orientation flowOrientation = (flow() == QListView::LeftToRight
                                          ? Qt::Horizontal : Qt::Vertical);
       if (flowOrientation == orientation) { // scrolling in the "flow" direction
          // ### wrapped scrolling in the flow direction
          return visibleFlowPositions.at(index); // ### always pixel based for now
-      } else if (!segmentStartRows.isEmpty()) { // we are scrolling in the "segment" direction
-         int segment = qBinarySearch<int>(segmentStartRows, index, 0, segmentStartRows.count() - 1);
-         int leftSegment = segment;
-         const int rightSegment = leftSegment;
+
+      } else if (! segmentStartRows.isEmpty()) {
+         // we are scrolling in the "segment" direction
+         int segment = cs_vector_query(segmentStartRows, index, 0, segmentStartRows.count() - 1);
+
+         int leftSegment            = segment;
+         const int rightSegment     = leftSegment;
          const int bottomCoordinate = segmentPositions.at(segment);
 
-         while (leftSegment > scrollValue &&
-                (bottomCoordinate - segmentPositions.at(leftSegment - 1) + itemExtent) <= (viewportSize)) {
+         while (leftSegment > scrollValue && (bottomCoordinate - segmentPositions.at(leftSegment - 1) + itemExtent) <= (viewportSize)) {
             leftSegment--;
          }
 

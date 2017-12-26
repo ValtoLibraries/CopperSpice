@@ -20,6 +20,8 @@
 *
 ***********************************************************************/
 
+#include <algorithm>
+
 #include <qtexttable.h>
 #include <qtextcursor.h>
 #include <qtextformat.h>
@@ -310,27 +312,33 @@ static inline bool operator<(const QFragmentFindHelper &helper, int fragment)
 
 int QTextTablePrivate::findCellIndex(int fragment) const
 {
-   QFragmentFindHelper helper(pieceTable->fragmentMap().position(fragment),
-                              pieceTable->fragmentMap());
-   QList<int>::ConstIterator it = qBinaryFind(cells.begin(), cells.end(), helper);
-   if (it == cells.end()) {
+   QFragmentFindHelper helper(pieceTable->fragmentMap().position(fragment), pieceTable->fragmentMap());
+
+   QList<int>::ConstIterator it = std::lower_bound(cells.constBegin(), cells.constEnd(), helper);
+
+   if ((it == cells.constEnd()) || (helper < *it)) {
       return -1;
    }
+
    return it - cells.begin();
 }
 
 void QTextTablePrivate::fragmentAdded(const QChar &type, uint fragment)
 {
    dirty = true;
+
    if (blockFragmentUpdates) {
       return;
    }
+
    if (type == QTextBeginningOfFrame) {
       Q_ASSERT(cells.indexOf(fragment) == -1);
       const uint pos = pieceTable->fragmentMap().position(fragment);
+
       QFragmentFindHelper helper(pos, pieceTable->fragmentMap());
-      QList<int>::Iterator it = qLowerBound(cells.begin(), cells.end(), helper);
+      QList<int>::Iterator it = std::lower_bound(cells.begin(), cells.end(), helper);
       cells.insert(it, fragment);
+
       if (!fragment_start || pos < pieceTable->fragmentMap().position(fragment_start)) {
          fragment_start = fragment;
       }
@@ -546,7 +554,7 @@ QTextTableCell QTextTable::cellAt(int position) const
    }
 
    QFragmentFindHelper helper(position, map);
-   QList<int>::ConstIterator it = qLowerBound(d->cells.begin(), d->cells.end(), helper);
+   QList<int>::ConstIterator it = std::lower_bound(d->cells.begin(), d->cells.end(), helper);
    if (it != d->cells.begin()) {
       --it;
    }
@@ -1009,9 +1017,13 @@ void QTextTable::mergeCells(int row, int column, int numRows, int numCols)
 
    // find the position at which to insert the contents of the merged cells
    QFragmentFindHelper helper(origCellPosition, p->fragmentMap());
-   QList<int>::Iterator it = qBinaryFind(d->cells.begin(), d->cells.end(), helper);
+
+   QList<int>::Iterator it = std::lower_bound(d->cells.begin(), d->cells.end(), helper);
+
    Q_ASSERT(it != d->cells.end());
+   Q_ASSERT(! (helper < *it));
    Q_ASSERT(*it == cellFragment);
+
    const int insertCellIndex = it - d->cells.begin();
    int insertFragment = d->cells.value(insertCellIndex + 1, d->fragment_end);
    uint insertPos = p->fragmentMap().position(insertFragment);
@@ -1042,9 +1054,12 @@ void QTextTable::mergeCells(int row, int column, int numRows, int numCols)
 
          if (firstCellIndex == -1) {
             QFragmentFindHelper helper(pos, p->fragmentMap());
-            QList<int>::Iterator it = qBinaryFind(d->cells.begin(), d->cells.end(), helper);
+            QList<int>::Iterator it = std::lower_bound(d->cells.begin(), d->cells.end(), helper);
+
             Q_ASSERT(it != d->cells.end());
+            Q_ASSERT(! (helper < *it));
             Q_ASSERT(*it == fragment);
+
             firstCellIndex = cellIndex = it - d->cells.begin();
          }
 
@@ -1179,7 +1194,8 @@ void QTextTable::splitCell(int row, int column, int numRows, int numCols)
    for (int r = row + 1; r < row + rowSpan; ++r) {
       // find the cell before which to insert the new cell markers
       int gridIndex = r * d->nCols + column;
-      QVector<int>::iterator it = qUpperBound(d->cellIndices.begin(), d->cellIndices.end(), gridIndex);
+
+      QVector<int>::iterator it = std::upper_bound(d->cellIndices.begin(), d->cellIndices.end(), gridIndex);
       int cellIndex = it - d->cellIndices.begin();
       int fragment = d->cells.value(cellIndex, d->fragment_end);
       rowPositions[r - row] = p->fragmentMap().position(fragment);

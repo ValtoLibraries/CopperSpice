@@ -23,14 +23,12 @@
 #ifndef QMULTIMAP_H
 #define QMULTIMAP_H
 
+#include <initializer_list>
+#include <map>
+
 #include <qcontainerfwd.h>
 #include <qmapfunc.h>
-
 #include <qlist.h>
-#include <qrefcount.h>
-
-#include <map>
-#include <initializer_list>
 
 template <typename Key, typename Val, typename C>
 class QMultiMapIterator;
@@ -99,14 +97,16 @@ class QMultiMap
          return *this;
       }
 
-      iterator &operator+(size_type n) {
-         std::advance(m_iter, n);
-         return *this;
+      iterator operator+(size_type n) const {
+         auto tmp = m_iter;
+         std::advance(tmp, n);
+         return tmp;
       }
 
-      iterator &operator-(size_type n) {
-         std::advance(m_iter, -n);
-         return *this;
+      iterator operator-(size_type n) const {
+         auto tmp = m_iter;
+         std::advance(tmp, -n);
+         return tmp;
       }
 
       iterator &operator++() {
@@ -195,14 +195,16 @@ class QMultiMap
          return *this;
       }
 
-      const_iterator &operator+(size_type n) {
-         std::advance(m_iter, n);
-         return *this;
+      const_iterator operator+(size_type n) const {
+         auto tmp = m_iter;
+         std::advance(tmp, n);
+         return tmp;
       }
 
-      const_iterator &operator-(size_type n) {
-         std::advance(m_iter, -n);
-         return *this;
+      const_iterator operator-(size_type n) const {
+         auto tmp = m_iter;
+         std::advance(tmp, -n);
+         return tmp;
       }
 
       const_iterator &operator++() {

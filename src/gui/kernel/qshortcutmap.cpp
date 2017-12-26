@@ -20,6 +20,8 @@
 *
 ***********************************************************************/
 
+#include <algorithm>
+
 #include <qshortcutmap_p.h>
 #include <qkeysequence.h>
 #include <qgraphicsscene.h>
@@ -140,8 +142,9 @@ int QShortcutMap::addShortcut(QObject *owner, const QKeySequence &key, Qt::Short
    Q_D(QShortcutMap);
 
    QShortcutEntry newEntry(owner, key, context, --(d->currentId), true);
-   QList<QShortcutEntry>::iterator it = qUpperBound(d->sequences.begin(), d->sequences.end(), newEntry);
+   QList<QShortcutEntry>::iterator it = std::upper_bound(d->sequences.begin(), d->sequences.end(), newEntry);
    d->sequences.insert(it, newEntry); // Insert sorted
+
 #if defined(DEBUG_QSHORTCUTMAP)
    qDebug().nospace()
          << "QShortcutMap::addShortcut(" << owner << ", "
@@ -408,7 +411,7 @@ bool QShortcutMap::hasShortcutForKeySequence(const QKeySequence &seq) const
    Q_D(const QShortcutMap);
    QShortcutEntry entry(seq); // needed for searching
    QList<QShortcutEntry>::ConstIterator itEnd = d->sequences.constEnd();
-   QList<QShortcutEntry>::ConstIterator it = qLowerBound(d->sequences.constBegin(), itEnd, entry);
+   QList<QShortcutEntry>::ConstIterator it = std::lower_bound(d->sequences.constBegin(), itEnd, entry);
 
    for (; it != itEnd; ++it) {
       if (matches(entry.keyseq, (*it).keyseq) == QKeySequence::ExactMatch && correctContext(*it) && (*it).enabled) {
@@ -453,11 +456,11 @@ QKeySequence::SequenceMatch QShortcutMap::find(QKeyEvent *e)
    bool identicalDisabledFound = false;
    QVector<QKeySequence> okEntries;
    int result = QKeySequence::NoMatch;
+
    for (int i = d->newEntries.count() - 1; i >= 0 ; --i) {
       QShortcutEntry entry(d->newEntries.at(i)); // needed for searching
       QList<QShortcutEntry>::ConstIterator itEnd = d->sequences.constEnd();
-      QList<QShortcutEntry>::ConstIterator it =
-         qLowerBound(d->sequences.constBegin(), itEnd, entry);
+      QList<QShortcutEntry>::ConstIterator it = std::lower_bound(d->sequences.constBegin(), itEnd, entry);
 
       int oneKSResult = QKeySequence::NoMatch;
       int tempRes = QKeySequence::NoMatch;

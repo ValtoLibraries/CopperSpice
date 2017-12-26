@@ -23,13 +23,13 @@
 #ifndef QBYTEARRAY_H
 #define QBYTEARRAY_H
 
+#include <qassert.h>
 #include <qrefcount.h>
 #include <qnamespace.h>
 #include <qarraydata.h>
 
 #include <string.h>
 #include <stdarg.h>
-
 #include <iterator>
 
 #ifdef truncate
@@ -77,7 +77,8 @@ inline int qstrncmp(const char *str1, const char *str2, uint len)
 Q_CORE_EXPORT int qstricmp(const char *, const char *);
 Q_CORE_EXPORT int qstrnicmp(const char *, const char *, uint len);
 
-// implemented in qvsnprintf.cpp
+
+// BROOM - delete these when QString8 active, implemented in qvsnprintf.cpp
 Q_CORE_EXPORT int qvsnprintf(char *str, size_t n, const char *fmt, va_list ap);
 Q_CORE_EXPORT int qsnprintf(char *str, size_t n, const char *fmt, ...);
 
@@ -246,17 +247,27 @@ class Q_CORE_EXPORT QByteArray
    QByteArray &replace(char before, char after);
 
    QList<QByteArray> split(char sep) const;
-
    QByteArray repeated(int times) const;
 
-   QByteArray &append(const QString &s);
-   QByteArray &insert(int i, const QString &s);
+   // BROOM - delete these when QString8 active
+   QByteArray &append(const QString &str);
+   QByteArray &insert(int i, const QString &str);
    QByteArray &replace(const QString &before, const char *after);
    QByteArray &replace(char c, const QString &after);
    QByteArray &replace(const QString &before, const QByteArray &after);
 
-   int indexOf(const QString &s, int from = 0) const;
-   int lastIndexOf(const QString &s, int from = -1) const;
+   int indexOf(const QString &str, int from = 0) const;
+   int lastIndexOf(const QString &str, int from = -1) const;
+
+   QByteArray &operator+=(const QString &str);
+   inline bool operator==(const QString &str) const;
+   inline bool operator!=(const QString &str) const;
+   inline bool operator<(const QString &str) const;
+   inline bool operator>(const QString &str) const;
+   inline bool operator<=(const QString &str) const;
+   inline bool operator>=(const QString &str) const;
+   // delete these when QString8 active
+
 
    // iterators
    inline iterator begin();
@@ -307,18 +318,9 @@ class Q_CORE_EXPORT QByteArray
    QByteRef operator[](int i);
    QByteRef operator[](uint i);
 
-   QByteArray &operator+=(const QString &s);
-
    QByteArray &operator+=(char c);
    QByteArray &operator+=(const char *s);
    QByteArray &operator+=(const QByteArray &a);
-
-   inline bool operator==(const QString &s2) const;
-   inline bool operator!=(const QString &s2) const;
-   inline bool operator<(const QString &s2) const;
-   inline bool operator>(const QString &s2) const;
-   inline bool operator<=(const QString &s2) const;
-   inline bool operator>=(const QString &s2) const;
 
    short toShort(bool *ok = 0, int base = 10) const;
    ushort toUShort(bool *ok = 0, int base = 10) const;
@@ -326,8 +328,8 @@ class Q_CORE_EXPORT QByteArray
    uint toUInt(bool *ok = 0, int base = 10) const;
    long toLong(bool *ok = 0, int base = 10) const;
    ulong toULong(bool *ok = 0, int base = 10) const;
-   qlonglong toLongLong(bool *ok = 0, int base = 10) const;
-   qulonglong toULongLong(bool *ok = 0, int base = 10) const;
+   qint64 toLongLong(bool *ok = 0, int base = 10) const;
+   quint64 toULongLong(bool *ok = 0, int base = 10) const;
    float toFloat(bool *ok = 0) const;
    double toDouble(bool *ok = 0) const;
    QByteArray toBase64() const;
@@ -340,16 +342,16 @@ class Q_CORE_EXPORT QByteArray
    QByteArray &setNum(ushort, int base = 10);
    QByteArray &setNum(int, int base = 10);
    QByteArray &setNum(uint, int base = 10);
-   QByteArray &setNum(qlonglong, int base = 10);
-   QByteArray &setNum(qulonglong, int base = 10);
+   QByteArray &setNum(qint64, int base = 10);
+   QByteArray &setNum(quint64, int base = 10);
    QByteArray &setNum(float, char f = 'g', int prec = 6);
    QByteArray &setNum(double, char f = 'g', int prec = 6);
    QByteArray &setRawData(const char *a, uint n); // ### Qt5/use an int
 
    static QByteArray number(int, int base = 10);
    static QByteArray number(uint, int base = 10);
-   static QByteArray number(qlonglong, int base = 10);
-   static QByteArray number(qulonglong, int base = 10);
+   static QByteArray number(qint64, int base = 10);
+   static QByteArray number(quint64, int base = 10);
    static QByteArray number(double, char f = 'g', int prec = 6);
    static QByteArray fromRawData(const char *, int size);
    static QByteArray fromBase64(const QByteArray &base64);
@@ -792,22 +794,22 @@ inline QByteArray &QByteArray::replace(const char *before, const char *after)
 
 inline QByteArray &QByteArray::setNum(short n, int base)
 {
-   return base == 10 ? setNum(qlonglong(n), base) : setNum(qulonglong(ushort(n)), base);
+   return base == 10 ? setNum(qint64(n), base) : setNum(quint64(ushort(n)), base);
 }
 
 inline QByteArray &QByteArray::setNum(ushort n, int base)
 {
-   return setNum(qulonglong(n), base);
+   return setNum(quint64(n), base);
 }
 
 inline QByteArray &QByteArray::setNum(int n, int base)
 {
-   return base == 10 ? setNum(qlonglong(n), base) : setNum(qulonglong(uint(n)), base);
+   return base == 10 ? setNum(qint64(n), base) : setNum(quint64(uint(n)), base);
 }
 
 inline QByteArray &QByteArray::setNum(uint n, int base)
 {
-   return setNum(qulonglong(n), base);
+   return setNum(quint64(n), base);
 }
 
 inline QByteArray &QByteArray::setNum(float n, char f, int prec)

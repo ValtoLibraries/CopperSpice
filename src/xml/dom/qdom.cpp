@@ -4810,7 +4810,7 @@ void QDomElementPrivate::save(QTextStream &s, int depth, int indent) const
    QString nsDecl(QLatin1String(""));
 
    if (!namespaceURI.isNull()) {
-      /** ### Qt 5:
+      /** ### Qt5:
        *
        * If we still have QDom, optimize this so that we only declare namespaces that are not
        * yet declared. We loose default namespace mappings, so maybe we should rather store
@@ -5057,7 +5057,7 @@ void QDomElement::setAttribute(const QString &name, const QString &value)
    IMPL->setAttribute(name, value);
 }
 
-void QDomElement::setAttribute(const QString &name, qlonglong value)
+void QDomElement::setAttribute(const QString &name, qint64 value)
 {
    if (!impl) {
       return;
@@ -5067,7 +5067,7 @@ void QDomElement::setAttribute(const QString &name, qlonglong value)
    IMPL->setAttribute(name, x);
 }
 
-void QDomElement::setAttribute(const QString &name, qulonglong value)
+void QDomElement::setAttribute(const QString &name, quint64 value)
 {
    if (!impl) {
       return;
@@ -5225,7 +5225,7 @@ void QDomElement::setAttributeNS(const QString nsURI, const QString &qName, cons
 }
 
 
-void QDomElement::setAttributeNS(const QString nsURI, const QString &qName, qlonglong value)
+void QDomElement::setAttributeNS(const QString nsURI, const QString &qName, qint64 value)
 {
    if (!impl) {
       return;
@@ -5238,7 +5238,7 @@ void QDomElement::setAttributeNS(const QString nsURI, const QString &qName, qlon
 /*!
     \overload
 */
-void QDomElement::setAttributeNS(const QString nsURI, const QString &qName, qulonglong value)
+void QDomElement::setAttributeNS(const QString nsURI, const QString &qName, quint64 value)
 {
    if (!impl) {
       return;
@@ -6426,8 +6426,7 @@ static void initializeReader(QXmlSimpleReader &reader, bool namespaceProcessing)
 {
    reader.setFeature(QLatin1String("http://xml.org/sax/features/namespaces"), namespaceProcessing);
    reader.setFeature(QLatin1String("http://xml.org/sax/features/namespace-prefixes"), !namespaceProcessing);
-   reader.setFeature(QLatin1String("http://trolltech.com/xml/features/report-whitespace-only-CharData"),
-                     false); // Shouldn't change in Qt 4
+   reader.setFeature(QLatin1String("http://copperspice.com/xml/features/report-whitespace-only-CharData"), false);
 }
 
 bool QDomDocumentPrivate::setContent(QXmlInputSource *source, bool namespaceProcessing, QString *errorMsg,

@@ -20,11 +20,9 @@
 *
 ***********************************************************************/
 
-#include <qconfig.h>
-
 #import <qcocoaview_mac_p.h>
-
 #include <cs_carbon_wrapper_p.h>
+
 #include <qwidget_p.h>
 #include <qt_mac_p.h>
 #include <qapplication_p.h>
@@ -647,7 +645,7 @@ static int qCocoaViewCount = 0;
    }
 
 #ifndef QT_NO_WHEELEVENT
-   // ### Qt 5: Send one QWheelEvent with dx, dy and dz
+   // ### Qt5: Send one QWheelEvent with dx, dy and dz
 
    if (deltaX != 0 && deltaY != 0) {
       QMacScrollOptimization::initDelayedScroll();

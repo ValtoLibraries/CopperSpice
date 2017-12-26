@@ -268,7 +268,7 @@ class QXmlSimpleReaderPrivate
       ExternParameterEntity(const QString &p, const QString &s)
          : publicId(p), systemId(s) {}
       QString publicId;
-      QString systemId;     
+      QString systemId;
    };
 
    struct ExternEntity {
@@ -277,7 +277,7 @@ class QXmlSimpleReaderPrivate
          : publicId(p), systemId(s), notation(n) {}
       QString publicId;
       QString systemId;
-      QString notation;      
+      QString notation;
    };
 
    QMap<QString, ExternParameterEntity> externParameterEntities;
@@ -1335,7 +1335,7 @@ QXmlInputSource::QXmlInputSource(QIODevice *dev)
 */
 QXmlInputSource::~QXmlInputSource()
 {
-   // ### Qt 5: close the input device. See task 153111
+   // ### Qt5: close the input device. See task 153111
 #ifndef QT_NO_TEXTCODEC
    delete d->encMapper;
 #endif
@@ -3155,7 +3155,6 @@ bool QXmlSimpleReader::feature(const QString &name, bool *ok) const
 {
    const QXmlSimpleReaderPrivate *d = d_func();
 
-   // "QT5" Change these strings to "cs.copperspice.com"
    if (ok != 0) {
       *ok = true;
    }
@@ -3166,12 +3165,10 @@ bool QXmlSimpleReader::feature(const QString &name, bool *ok) const
    } else if (name == QLatin1String("http://xml.org/sax/features/namespace-prefixes")) {
       return d->useNamespacePrefixes;
 
-   } else if (name ==
-              QLatin1String("http://trolltech.com/xml/features/report-whitespace-only-CharData")) { // Shouldn't change in Qt 4
+   } else if (name == QLatin1String("http://copperspice.com/xml/features/report-whitespace-only-CharData")) {
       return d->reportWhitespaceCharData;
 
-   } else if (name ==
-              QLatin1String("http://trolltech.com/xml/features/report-start-end-entity")) { // Shouldn't change in Qt 4
+   } else if (name == QLatin1String("http://copperspice.com/xml/features/report-start-end-entity")) {
       return d->reportEntities;
 
    } else {
@@ -3188,17 +3185,18 @@ void QXmlSimpleReader::setFeature(const QString &name, bool enable)
 {
    Q_D(QXmlSimpleReader);
 
-   // "QT5" Change these strings to "cs.copperspice.com"
    if (name == QLatin1String("http://xml.org/sax/features/namespaces")) {
       d->useNamespaces = enable;
+
    } else if (name == QLatin1String("http://xml.org/sax/features/namespace-prefixes")) {
       d->useNamespacePrefixes = enable;
-   } else if (name ==
-              QLatin1String("http://trolltech.com/xml/features/report-whitespace-only-CharData")) { // Shouldn't change in Qt 4
+
+   } else if (name == QLatin1String("http://copperspice.com/xml/features/report-whitespace-only-CharData")) {
       d->reportWhitespaceCharData = enable;
-   } else if (name ==
-              QLatin1String("http://trolltech.com/xml/features/report-start-end-entity")) { // Shouldn't change in Qt 4
+
+   } else if (name == QLatin1String("http://copperspice.com/xml/features/report-start-end-entity")) {
       d->reportEntities = enable;
+
    } else {
       qWarning("Unknown feature %s", name.toLatin1().data());
    }
@@ -3208,13 +3206,13 @@ void QXmlSimpleReader::setFeature(const QString &name, bool enable)
 */
 bool QXmlSimpleReader::hasFeature(const QString &name) const
 {
-   // "QT5" Change these strings to "cs.copperspice.com"
    if (name == QLatin1String("http://xml.org/sax/features/namespaces")
          || name == QLatin1String("http://xml.org/sax/features/namespace-prefixes")
-         || name ==
-         QLatin1String("http://trolltech.com/xml/features/report-whitespace-only-CharData") // Shouldn't change in Qt 4
-         || name == QLatin1String("http://trolltech.com/xml/features/report-start-end-entity")) { // Shouldn't change in Qt 4
+         || name == QLatin1String("http://copperspice.com/xml/features/report-whitespace-only-CharData")
+         || name == QLatin1String("http://copperspice.com/xml/features/report-start-end-entity")) {
+
       return true;
+
    } else {
       return false;
    }

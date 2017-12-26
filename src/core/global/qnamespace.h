@@ -42,29 +42,29 @@ class Q_CORE_EXPORT Qt
       struct cs_classname {
          static constexpr const char *value = "Qt";
       };
-   
+
       ~Qt();
 
    public:
       using cs_parent = CSGadget_Fake_Parent;
       using cs_class = Qt;
-   
+
       static const char *cs_className();
       static const QMetaObject_T<Qt> &staticMetaObject();
       virtual const QMetaObject *metaObject() const;
-       
-      template<int N> 
-      static void cs_regTrigger(cs_number<N>) 
-      { } 
 
-      static constexpr cs_number<0> cs_counter(cs_number<0>)  
-      { 
-         return cs_number<0>{};   
-      } 
+      template<int N>
+      static void cs_regTrigger(cs_number<N>)
+      { }
+
+      static constexpr cs_number<0> cs_counter(cs_number<0>)
+      {
+         return cs_number<0>{};
+      }
 
       // implemented in QString.h
       static QString escape(const QString &plain);
-    
+
       enum GlobalColor {
          color0,
          color1,
@@ -119,8 +119,7 @@ class Q_CORE_EXPORT Qt
       NoButton         = 0x00000000,
       LeftButton       = 0x00000001,
       RightButton      = 0x00000002,
-      MidButton        = 0x00000004, // ### Qt5/remove me
-      MiddleButton     = MidButton,
+      MiddleButton     = 0x00000004,
       XButton1         = 0x00000008,
       XButton2         = 0x00000010,
       MouseButtonMask  = 0x000000ff
@@ -255,7 +254,7 @@ class Q_CORE_EXPORT Qt
       WA_Disabled = 0,
       WA_UnderMouse = 1,
       WA_MouseTracking = 2,
-      WA_OpaquePaintEvent = 4,     
+      WA_OpaquePaintEvent = 4,
       WA_StaticContents = 5,
       WA_LaidOut = 7,
       WA_PaintOnScreen = 8,
@@ -317,7 +316,7 @@ class Q_CORE_EXPORT Qt
 
       WA_AcceptDrops = 78,
       WA_DropSiteRegistered = 79, // internal
- 
+
       WA_WindowPropagation = 80,
 
       WA_NoX11EventCompression = 81,
@@ -402,8 +401,7 @@ class Q_CORE_EXPORT Qt
       AA_MacPluginApplication = 5,
       AA_DontUseNativeMenuBar = 6,
       AA_MacDontSwapCtrlAndMeta = 7,
-      AA_S60DontConstructApplicationPanes = 8,
-      AA_S60DisablePartialScreenInputMode = 9,
+
       AA_X11InitThreads = 10,
       AA_CaptureMultimediaKeys = 11,
 
@@ -1106,7 +1104,7 @@ class Q_CORE_EXPORT Qt
    enum ConnectionType {
       AutoConnection,
       DirectConnection,
-      QueuedConnection,     
+      QueuedConnection,
       BlockingQueuedConnection,
       UniqueConnection =  0x80
    };
@@ -1319,8 +1317,6 @@ class Q_CORE_EXPORT Qt
    typedef void *HANDLE;
 
 #endif
-
-   typedef WindowFlags WFlags;
 
    enum WindowModality {
       NonModal,

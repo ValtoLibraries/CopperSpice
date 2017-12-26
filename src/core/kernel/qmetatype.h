@@ -100,7 +100,6 @@ class Q_CORE_EXPORT QMetaType
    static bool isRegistered(int type);
    static void *construct(int type, const void *copy = 0);
    static void destroy(int type, void *data);
-   static void unregisterType(const char *typeName);
 
 #ifndef QT_NO_DATASTREAM
    static bool save(QDataStream &stream, int type, const void *data);
@@ -371,8 +370,8 @@ Q_DECLARE_BUILTIN_METATYPE(ulong, ULong)
 Q_DECLARE_BUILTIN_METATYPE(ushort, UShort)
 Q_DECLARE_BUILTIN_METATYPE(uchar, UChar)
 Q_DECLARE_BUILTIN_METATYPE(float, Float)
-Q_DECLARE_BUILTIN_METATYPE(qlonglong, LongLong)
-Q_DECLARE_BUILTIN_METATYPE(qulonglong, ULongLong)
+Q_DECLARE_BUILTIN_METATYPE(qint64, LongLong)
+Q_DECLARE_BUILTIN_METATYPE(quint64, ULongLong)
 
 Q_DECLARE_BUILTIN_METATYPE(QChar, QChar)
 Q_DECLARE_BUILTIN_METATYPE(QString, QString)

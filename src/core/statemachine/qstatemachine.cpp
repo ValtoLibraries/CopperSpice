@@ -20,6 +20,8 @@
 *
 ***********************************************************************/
 
+#include <algorithm>
+
 #include <qstatemachine.h>
 
 #ifndef QT_NO_STATEMACHINE
@@ -27,16 +29,20 @@
 #include <qstate.h>
 #include <qstate_p.h>
 #include <qstatemachine_p.h>
+
 #include <qabstracttransition.h>
 #include <qabstracttransition_p.h>
-#include <qsignaltransition.h>
-#include <qsignaleventgenerator_p.h>
 #include <qabstractstate.h>
 #include <qabstractstate_p.h>
+#include <qalgorithms.h>
 #include <qfinalstate.h>
 #include <qhistorystate.h>
 #include <qhistorystate_p.h>
+#include <qsignaltransition.h>
+#include <qsignaleventgenerator_p.h>
 #include <qthread_p.h>
+#include <qmetaobject.h>
+#include <qdebug.h>
 
 #ifndef QT_NO_STATEMACHINE_EVENTFILTER
 #include <qeventtransition.h>
@@ -48,11 +54,6 @@
 #include <qanimationgroup.h>
 #include <qvariantanimation_p.h>
 #endif
-
-#include <qmetaobject.h>
-#include <qdebug.h>
-
-QT_BEGIN_NAMESPACE
 
 // messages not required  #define QSTATEMACHINE_DEBUG
 
@@ -322,7 +323,8 @@ QList<QAbstractState *> QStateMachinePrivate::exitStates(QEvent *event,
       }
    }
    QList<QAbstractState *> statesToExit_sorted = statesToExit.toList();
-   qSort(statesToExit_sorted.begin(), statesToExit_sorted.end(), stateExitLessThan);
+   std::sort(statesToExit_sorted.begin(), statesToExit_sorted.end(), stateExitLessThan);
+
    for (int i = 0; i < statesToExit_sorted.size(); ++i) {
       QAbstractState *s = statesToExit_sorted.at(i);
       if (QState *grp = toStandardState(s)) {
@@ -425,7 +427,7 @@ QList<QAbstractState *> QStateMachinePrivate::enterStates(QEvent *event,
    }
 
    QList<QAbstractState *> statesToEnter_sorted = statesToEnter.toList();
-   qSort(statesToEnter_sorted.begin(), statesToEnter_sorted.end(), stateEntryLessThan);
+   std::sort(statesToEnter_sorted.begin(), statesToEnter_sorted.end(), stateEntryLessThan);
 
    for (int i = 0; i < statesToEnter_sorted.size(); ++i) {
       QAbstractState *s = statesToEnter_sorted.at(i);
@@ -2282,7 +2284,5 @@ QStateMachine::WrappedEvent::~WrappedEvent()
    delete m_event;
 }
 
-
-QT_END_NAMESPACE
 
 #endif //QT_NO_STATEMACHINE

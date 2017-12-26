@@ -20,6 +20,8 @@
 *
 ***********************************************************************/
 
+#include <algorithm>
+
 #include <qabstractbutton.h>
 #include <qabstractitemview.h>
 #include <qbuttongroup.h>
@@ -106,29 +108,26 @@ void QButtonGroup::setExclusive(bool exclusive)
    d->exclusive = exclusive;
 }
 
-
-// TODO: Qt 5: Merge with addButton(QAbstractButton *button, int id)
-void QButtonGroup::addButton(QAbstractButton *button)
-{
-   addButton(button, -1);
-}
-
 void QButtonGroup::addButton(QAbstractButton *button, int id)
 {
    Q_D(QButtonGroup);
+
    if (QButtonGroup *previous = button->d_func()->group) {
       previous->removeButton(button);
    }
+
    button->d_func()->group = this;
    d->buttonList.append(button);
+
    if (id == -1) {
       QList<int> ids = d->mapping.values();
       if (ids.isEmpty()) {
          d->mapping[button] = -2;
       } else {
-         qSort(ids);
+         std::sort(ids.begin(), ids.end());
          d->mapping[button] = ids.first() - 1;
       }
+
    } else {
       d->mapping[button] = id;
    }

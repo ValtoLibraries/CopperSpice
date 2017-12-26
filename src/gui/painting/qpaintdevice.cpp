@@ -20,9 +20,8 @@
 *
 ***********************************************************************/
 
-#include "qpaintdevice.h"
-
-QT_BEGIN_NAMESPACE
+#include <qpaintdevice.h>
+#include <qlog.h>
 
 extern void qt_painter_removePaintDevice(QPaintDevice *); //qpainter.cpp
 
@@ -33,9 +32,10 @@ QPaintDevice::QPaintDevice()
 
 QPaintDevice::~QPaintDevice()
 {
-   if (paintingActive())
-      qWarning("QPaintDevice: Cannot destroy paint device that is being "
-               "painted");
+   if (paintingActive()) {
+      qWarning("QPaintDevice: Can not destroy paint device which is being painted");
+   }
+
    qt_painter_removePaintDevice(this);
 }
 
@@ -53,4 +53,3 @@ Q_GUI_EXPORT int qt_paint_device_metric(const QPaintDevice *device, QPaintDevice
    return device->metric(metric);
 }
 
-QT_END_NAMESPACE

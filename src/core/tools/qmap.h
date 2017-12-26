@@ -23,14 +23,12 @@
 #ifndef QMAP_H
 #define QMAP_H
 
-#include <qcontainerfwd.h>
-#include <qmapfunc.h>
-
-#include <qlist.h>
-#include <qrefcount.h>
-
-#include <map>
 #include <initializer_list>
+#include <map>
+
+#include <qcontainerfwd.h>
+#include <qlist.h>
+#include <qmapfunc.h>
 
 template <typename Key, typename Val, typename C>
 class QMapIterator;
@@ -99,14 +97,16 @@ class QMap
          return *this;
       }
 
-      iterator &operator+(size_type n) {
-         std::advance(m_iter, n);
-         return *this;
+      iterator operator+(size_type n) const {
+         auto tmp = m_iter;
+         std::advance(tmp, n);
+         return tmp;
       }
 
-      iterator &operator-(size_type n) {
-         std::advance(m_iter, -n);
-         return *this;
+      iterator operator-(size_type n) const {
+         auto tmp = m_iter;
+         std::advance(tmp, -n);
+         return tmp;
       }
 
       iterator &operator++() {
@@ -194,14 +194,16 @@ class QMap
          return *this;
       }
 
-      const_iterator &operator+(size_type n) {
-         std::advance(m_iter, n);
-         return *this;
+      const_iterator operator+(size_type n) const {
+         auto tmp = m_iter;
+         std::advance(tmp, n);
+         return tmp;
       }
 
-      const_iterator &operator-(size_type n) {
-         std::advance(m_iter, -n);
-         return *this;
+      const_iterator operator-(size_type n) const {
+         auto tmp = m_iter;
+         std::advance(tmp, -n);
+         return tmp;
       }
 
       const_iterator &operator++() {
@@ -353,8 +355,7 @@ class QMap
 
    iterator insert(const_iterator hint, const Key &key, const Val &value) {
       auto oldSize = m_data.size();
-
-      auto iter = m_data.emplace_hint(hint, key, value);
+      auto iter    = m_data.emplace_hint(hint.m_iter, key, value);
 
       if (m_data.size() == oldSize) {
          // add new element

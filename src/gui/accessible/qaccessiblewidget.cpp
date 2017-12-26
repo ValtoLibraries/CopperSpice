@@ -133,8 +133,9 @@ QString Q_GUI_EXPORT qt_accStripAmp(const QString &text)
 QString Q_GUI_EXPORT qt_accHotKey(const QString &text)
 {
    int ampIndex = qt_accAmpIndex(text);
+
    if (ampIndex != -1) {
-      return (QString)QKeySequence(Qt::ALT) + text.at(ampIndex + 1);
+      return QKeySequence(Qt::ALT).toString() + text.at(ampIndex + 1);
    }
 
    return QString();
@@ -986,7 +987,7 @@ QAccessible::State QAccessibleWidget::state(int child) const
    return state;
 }
 
-// ### Qt 5: remove me - binary compatibility hack
+// ### Qt5: remove me - binary compatibility hack
 QAccessibleWidgetEx::QAccessibleWidgetEx(QWidget *o, Role role, const QString &name)
    : QAccessibleObjectEx(o)
 {

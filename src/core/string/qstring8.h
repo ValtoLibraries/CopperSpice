@@ -32,6 +32,7 @@
 #include <qchar32.h>
 #include <qbytearray.h>
 
+class QStringParser;
 class QRegExp;
 
 class Q_CORE_EXPORT QChar32Arrow : public CsString::CsCharArrow
@@ -98,6 +99,10 @@ class Q_CORE_EXPORT QString8 : public CsString::CsString
 
          iterator operator-(size_type n) const {
             return CsString::CsString::iterator::operator-(n);
+         }
+
+         size_type operator-(iterator other) const {
+            return CsString::CsString::iterator::operator-(other);
          }
 
          iterator &operator++() {
@@ -171,6 +176,10 @@ class Q_CORE_EXPORT QString8 : public CsString::CsString
             return CsString::CsString::const_iterator::operator-(n);
          }
 
+         size_type operator-(const_iterator other) const {
+            return CsString::CsString::const_iterator::operator-(other);
+         }
+
          const_iterator &operator++() {
             CsString::CsString::const_iterator::operator++();
             return *this;
@@ -197,8 +206,6 @@ class Q_CORE_EXPORT QString8 : public CsString::CsString
          NormalizationForm_KC
       };
 
-      enum SplitBehavior { KeepEmptyParts, SkipEmptyParts };
-
       using Iterator        = iterator;
       using ConstIterator   = const_iterator;
 
@@ -216,28 +223,34 @@ class Q_CORE_EXPORT QString8 : public CsString::CsString
       QString8(QChar32 c);
       QString8(size_type size, QChar32 c);
 
-      QString8(const QChar32 *data, size_type size = -1)  {
+      QString8(const QChar32 *str, size_type size = -1)  {
 
          if (size == -1) {
-            const QChar32 *p = data;
+            const QChar32 *p = str;
 
             while (p->unicode() != 0) {
                ++p;
             }
 
-            CsString::CsString::append(data, p);
+            CsString::CsString::append(str, p);
 
          } else {
-            CsString::CsString::append(data, data + size);
+            CsString::CsString::append(str, str + size);
 
          }
       }
 
       // for an array of chars
       template <int N>
-      QString8(const char (&str)[N])
-         : CsString::CsString(str)
+      QString8(const char (&cStr)[N])
+         : CsString::CsString(cStr)
       { }
+
+#ifdef CS_STRING_ALLOW_UNSAFE
+      QString8(const QByteArray &str)
+         : QString8(fromUtf8(str))
+      { }
+#endif
 
       template <typename Iterator>
       QString8(Iterator begin, Iterator end)
@@ -264,6 +277,19 @@ class Q_CORE_EXPORT QString8 : public CsString::CsString
 
 
       // methods
+
+
+/*    broom - review this
+
+      // for an array of chars
+      template <int N>
+      QString8 &append(const char (&cStr)[N]) {
+         CsString::CsString::append(cStr);
+         return *this;
+      }
+
+*/
+
       QString8 &append(QChar32 c)  {
          CsString::CsString::append(c);
          return *this;
@@ -274,13 +300,13 @@ class Q_CORE_EXPORT QString8 : public CsString::CsString
          return *this;
       }
 
-      QString8 &append(const QChar32 *data, size_type size)  {
-         CsString::CsString::append(data, data + size);
+      QString8 &append(const QString8 &other)  {
+         CsString::CsString::append(other);
          return *this;
       }
 
-      QString8 &append(const QString8 &other)  {
-         CsString::CsString::append(other);
+      QString8 &append(const QChar32 *data, size_type size)  {
+         CsString::CsString::append(data, data + size);
          return *this;
       }
 
@@ -455,8 +481,8 @@ class Q_CORE_EXPORT QString8 : public CsString::CsString
          return *this;
       }
 
-      QString8 &prepend(const char *other) {
-         CsString::CsString::insert(begin(), other);
+      QString8 &prepend(char c) {
+         CsString::CsString::insert(begin(), c);
          return *this;
       }
 
@@ -487,8 +513,22 @@ class Q_CORE_EXPORT QString8 : public CsString::CsString
       QString8 &remove(QChar32 c, Qt::CaseSensitivity cs = Qt::CaseSensitive);
       QString8 &remove(const QString8 &str, Qt::CaseSensitivity cs = Qt::CaseSensitive);
 
+      QString8 &replace(QChar32 before, QChar32 after, Qt::CaseSensitivity cs = Qt::CaseSensitive);
+
+      QString8 &replace(const QChar32 *before, size_type beforeSize, const QChar32 *after, size_type afterSize,
+                  Qt::CaseSensitivity cs = Qt::CaseSensitive);
+
+      QString8 &replace(const QString8 &before, const QString8 &after, Qt::CaseSensitivity cs = Qt::CaseSensitive);
+      QString8 &replace(QChar32 c, const QString8 &after, Qt::CaseSensitivity cs = Qt::CaseSensitive);
+
       QString8 &replace(size_type index, size_type numOfChars, QChar32 c) {
          CsString::CsString::replace(index, numOfChars, 1, c);
+         return *this;
+      }
+
+      QString8 &replace(size_type index, size_type numOfChars, const QChar32 *data, size_type size)
+      {
+         replace(index, numOfChars, QString8(data, size));
          return *this;
       }
 
@@ -532,12 +572,6 @@ class Q_CORE_EXPORT QString8 : public CsString::CsString
          return CsString::CsString::size();
       }
 
-      QList<QString8> split(QChar32 sep, SplitBehavior behavior = KeepEmptyParts,
-                  Qt::CaseSensitivity cs = Qt::CaseSensitive) const Q_REQUIRED_RESULT;
-
-      QList<QString8> split(const QString8 &sep, SplitBehavior behavior = KeepEmptyParts,
-                  Qt::CaseSensitivity cs = Qt::CaseSensitive) const Q_REQUIRED_RESULT;
-
       bool startsWith(QChar32 c, Qt::CaseSensitivity cs = Qt::CaseSensitive) const;
       bool startsWith(const QString8 &other, Qt::CaseSensitivity cs = Qt::CaseSensitive) const;
 
@@ -560,6 +594,10 @@ class Q_CORE_EXPORT QString8 : public CsString::CsString
       QString8 toUpper() const & Q_REQUIRED_RESULT;
       QString8 toUpper() && Q_REQUIRED_RESULT;
 
+      QByteArray toLatin1() const Q_REQUIRED_RESULT;
+      QByteArray toUtf8() const Q_REQUIRED_RESULT;
+      QByteArray toUtf16() const Q_REQUIRED_RESULT;
+
       QString8 trimmed() const & Q_REQUIRED_RESULT;
       QString8 trimmed() && Q_REQUIRED_RESULT;
 
@@ -567,6 +605,51 @@ class Q_CORE_EXPORT QString8 : public CsString::CsString
 
       const uint8_t *utf8() const {
          return CsString::CsString::constData();
+      }
+
+      // static
+      static QString8 fromLatin1(const QByteArray &str);
+      static QString8 fromLatin1(const char *str, size_type size = -1);
+
+      static QString8 fromUtf8(const QByteArray &str);
+      static QString8 fromUtf8(const char *str, size_type size = -1);
+      static QString8 fromUtf16(const char16_t *str, size_type size = -1);
+
+      // wrappers
+      template <typename SP = QStringParser, typename ...Ts>
+      QString8 formatArg(Ts... args) const
+      {
+         return SP::formatArg(*this, args...);
+      }
+
+      template <typename SP = QStringParser, typename ...Ts>
+      QString8 formatArgs(Ts... args) const
+      {
+         return SP::formatArgs(*this, args...);
+      }
+
+      template <typename V, typename SP = QStringParser>
+      static QString8 number(V value, int base  = 10)
+      {
+         return SP::template number<QString8>(value, base);
+      }
+
+      template <typename SP = QStringParser>
+      static QString8 number(double value, char format = 'g', int precision = 6)
+      {
+         return SP::template number<QString8>(value, format, precision);
+      }
+
+      template <typename SP = QStringParser, typename ...Ts>
+      auto split(QChar32 sep, Ts... args) const
+      {
+         return SP::split(*this, sep, args...);
+      }
+
+      template <typename SP = QStringParser, typename ...Ts>
+      auto split(const QString8 &sep, Ts... args) const
+      {
+         return SP::split(*this, sep, args...);
       }
 
       // iterators
@@ -627,6 +710,9 @@ class Q_CORE_EXPORT QString8 : public CsString::CsString
       }
 
       // operators
+      QString8 &operator=(const QString8 &other) = default;
+      QString8 &operator=(QString8 && other) = default;
+
       QString8 &operator=(QChar32 c)  {
          CsString::CsString::operator=(c);
          return *this;
@@ -642,9 +728,6 @@ class Q_CORE_EXPORT QString8 : public CsString::CsString
          return *this;
       }
 
-      QString8 &operator=(const QString8 &other) = default;
-      QString8 &operator=(QString8 && other) = default;
-
       QChar32 operator[](size_type index) const {
          return CsString::CsString::operator[](index);
       }
@@ -653,6 +736,179 @@ class Q_CORE_EXPORT QString8 : public CsString::CsString
       const_iterator cs_internal_find_fast(const QString8 &str, const_iterator iter_begin) const;
 
 };
+
+inline bool operator==(const QString8 &str1, const QString8 &str2)
+{
+   return (static_cast<CsString::CsString>(str1) == static_cast<CsString::CsString>(str2));
+}
+
+// for an array of chars
+template <int N>
+inline bool operator==(const char (&cStr)[N], const QString8 &str)
+{
+   return (static_cast<CsString::CsString>(str) == cStr);
+}
+
+// for an array of chars
+template <int N>
+inline bool operator==(const QString8 &str, const char (&cStr)[N])
+{
+   return (static_cast<CsString::CsString>(str) == cStr);
+}
+
+inline bool operator!=(const QString8 &str1, const QString8 &str2)
+{
+   return ! (str1 == str2);
+}
+
+// for an array of chars
+template <int N>
+inline bool operator!=(const char (&cStr)[N], const QString8 &str)
+{
+   return ! (str == cStr);
+}
+
+// for an array of chars
+template <int N>
+inline bool operator!=(const QString8 &str, const char (&cStr)[N])
+{
+   return ! (str == cStr);
+}
+
+inline const QString8 operator+(const QString8 &str1, const QString8 &str2)
+{
+   QString8 t(str1);
+   t += str2;
+   return t;
+}
+
+inline QString8 &&operator+(QString8 &&str1, const QString8 &str2)
+{
+   str1 += str2;
+   return std::move(str1);
+}
+
+inline const QString8 operator+(QChar32 c, const QString8 &str)
+{
+   QString8 t = str;
+   t.prepend(c);
+   return t;
+}
+
+inline const QString8 operator+(const QString8 &str, QChar32 c)
+{
+   QString8 t = str;
+   t += c;
+   return t;
+}
+
+inline QString8 &&operator+(QString8 &&str, QChar32 c)
+{
+   str += c;
+   return std::move(str);
+}
+
+// for an array of chars
+template <int N>
+inline const QString8 operator+(const char (&cStr)[N], const QString8 &str)
+{
+   QString8 t(str);
+   t.prepend(cStr);
+   return t;
+}
+
+// for an array of chars
+template <int N>
+inline const QString8 operator+(const QString8 &str, const char (&cStr)[N])
+{
+   QString8 t(str);
+   t += cStr;
+   return t;
+}
+
+// for an array of chars
+template <int N>
+inline QString8 &&operator+(QString8 &&str, const char (&cStr)[N])
+{
+   str += cStr;
+   return std::move(str);
+}
+
+inline bool operator<(const QString8 &str1, const QString8 &str2)
+{
+   return (static_cast<CsString::CsString>(str1) < static_cast<CsString::CsString>(str2));
+}
+
+// for an array of chars
+template <int N>
+inline bool operator<(const char (&cStr)[N], const QString8 &str)
+{
+   return ! (static_cast<CsString::CsString>(str) >= cStr);
+}
+
+// for an array of chars
+template <int N>
+inline bool operator<(const QString8 &str, const char (&cStr)[N])
+{
+   return (static_cast<CsString::CsString>(str) < cStr);
+}
+
+inline bool operator<=(const QString8 &str1, const QString8 &str2)
+{
+   return (static_cast<CsString::CsString>(str1) <= static_cast<CsString::CsString>(str2));
+}
+
+// for an array of chars
+template <int N>
+inline bool operator<=(const char (&cStr)[N], const QString8 &str)
+{
+   return ! (static_cast<CsString::CsString>(str) > cStr);
+}
+
+// for an array of chars
+template <int N>
+inline bool operator<=(const QString8 &str, const char (&cStr)[N])
+{
+   return (static_cast<CsString::CsString>(str) <= cStr);
+}
+
+inline bool operator>(const QString8 &str1, const QString8 &str2)
+{
+   return (static_cast<CsString::CsString>(str1) > static_cast<CsString::CsString>(str2));
+}
+
+// for an array of chars
+template <int N>
+inline bool operator>(const char (&cStr)[N], const QString8 &str)
+{
+   return ! (static_cast<CsString::CsString>(str) <= cStr);
+}
+
+// for an array of chars
+template <int N>
+inline bool operator>(const QString8 &str, const char (&cStr)[N])
+{
+   return (static_cast<CsString::CsString>(str) > cStr);
+}
+
+inline bool operator>=(const QString8 &str1, const QString8 &str2)
+{
+   return (static_cast<CsString::CsString>(str1) >= static_cast<CsString::CsString>(str2));
+}
+
+// for an array of chars
+template <int N>
+inline bool operator>=(const char (&cStr)[N], const QString8 &str)
+{
+   return ! (static_cast<CsString::CsString>(str) < cStr);
+}
+
+// for an array of chars
+template <int N>
+inline bool operator>=(const QString8 &str, const char (&cStr)[N])
+{
+   return (static_cast<CsString::CsString>(str) >= cStr);
+}
 
 inline void swap(QString8 &a, QString8 &b) {
    a.swap(b);

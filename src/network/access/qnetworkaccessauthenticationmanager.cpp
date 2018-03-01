@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -25,14 +25,13 @@
 #include <qnetworkaccessmanager.h>
 #include <qnetworkaccessmanager_p.h>
 #include <qnetworkaccessauthenticationmanager_p.h>
+#include <qsslerror.h>
 
-#include <QtCore/qbuffer.h>
-#include <QtCore/qurl.h>
-#include <QtCore/qvector.h>
-#include <QtCore/QMutexLocker>
-#include <QtNetwork/qauthenticator.h>
-
-QT_BEGIN_NAMESPACE
+#include <qauthenticator.h>
+#include <qbuffer.h>
+#include <qmutex.h>
+#include <qurl.h>
+#include <qvector.h>
 
 class QNetworkAuthenticationCache: private QVector<QNetworkAuthenticationCredential>, public QNetworkAccessCache::CacheableObject
 {
@@ -73,13 +72,14 @@ class QNetworkAuthenticationCache: private QVector<QNetworkAuthenticationCredent
          if (closestMatch) {
             auto tmp = begin() + (++closestMatch - data());
             QVector<QNetworkAuthenticationCredential>::insert(tmp, newCredential);
+
          } else {
             QVector<QNetworkAuthenticationCredential>::insert(end(), newCredential);
          }
       }
    }
 
-   virtual void dispose() override {
+   void dispose() override {
       delete this;
    }
 };
@@ -112,9 +112,8 @@ static QByteArray proxyAuthenticationKey(const QNetworkProxy &proxy, const QStri
          // let there be errors if a new proxy type is added in the future
    }
 
-   if (key.scheme().isEmpty())
+   if (key.scheme().isEmpty()) {
       // proxy type not handled
-   {
       return QByteArray();
    }
 
@@ -223,6 +222,11 @@ void QNetworkAccessAuthenticationManager::cacheCredentials(const QUrl &url,
       const QAuthenticator *authenticator)
 {
    Q_ASSERT(authenticator);
+
+   if (authenticator->isNull()) {
+      return;
+   }
+
    QString domain = QString::fromLatin1("/"); // FIXME: make QAuthenticator return the domain
    QString realm = authenticator->realm();
 
@@ -300,5 +304,4 @@ void QNetworkAccessAuthenticationManager::clearCache()
    authenticationCache.clear();
 }
 
-QT_END_NAMESPACE
 

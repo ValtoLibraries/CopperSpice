@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -33,7 +33,7 @@
 #include <Security/Security.h>
 #include <Security/SecureTransport.h>
 
-QT_BEGIN_NAMESPACE
+
 
 class QSecureTransportContext
 {
@@ -47,7 +47,7 @@ class QSecureTransportContext
  private:
     SSLContextRef context;
 
-    Q_DISABLE_COPY(QSecureTransportContext);
+    Q_DISABLE_COPY(QSecureTransportContext)
 };
 
 class QSslSocketBackendPrivate : public QSslSocketPrivate
@@ -91,9 +91,9 @@ class QSslSocketBackendPrivate : public QSslSocketPrivate
 
     QSecureTransportContext context;
 
-    Q_DISABLE_COPY(QSslSocketBackendPrivate);
+    Q_DISABLE_COPY(QSslSocketBackendPrivate)
 };
 
-QT_END_NAMESPACE
+
 
 #endif

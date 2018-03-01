@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -20,46 +20,32 @@
 *
 ***********************************************************************/
 
-#include <qstring8.h>
+#include <qstring16.h>
 #include <qdatastream.h>
-#include <qregexp.h>
+#include <qregularexpression.h>
 #include <qunicodetables_p.h>
 
+// data stream
+QDataStream &operator>>(QDataStream &in, QString16 &str)
+{
+
 /*
+   char *tmp;
+   uint len;
 
-QString16::QString16(QChar32 c)
-   : CsString::CsString_utf16(1, c)
-{
-}
-
-QString16::QString16(size_type size, QChar32 c)
-   : CsString::CsString_utf16(size, c)
-{
-}
-
+   in.readBytes(tmp, len);
+   str = QString8::fromUtf8(tmp, len);
+   delete [] tmp;
 */
 
-// methods
+   return in;
+}
 
-
-// iterators
-
-
-// operators
-
-#if ! defined(QT_NO_DATASTREAM)
-   QDataStream &operator>>(QDataStream &out, QString16 &str)
-   {
-      // broom - not implemented
-      return out;
-   }
-
-   QDataStream &operator<<(QDataStream &out, const QString16 &str)
-   {
-      // broom - not implemented
-      return out;
-   }
-#endif
+QDataStream &operator<<(QDataStream &out, const QString16 &str)
+{
+   // out.writeBytes(str.constData(), str.size_storage());
+   return out;
+}
 
 
 

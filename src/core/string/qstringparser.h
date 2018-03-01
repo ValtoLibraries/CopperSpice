@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -236,15 +236,13 @@ class Q_CORE_EXPORT QStringParser
       }
 
       template <typename T, typename V>
-      static T join(const QList<T> &list, const V &sep);
+      static T join(const QList<T> &list, const V &separator);
 
 
       // b1  value - quint64, long, short, etc
       template <typename T = QString8, typename V>
       static T number(V value, int base  = 10)
       {
-         T retval;
-
          if (base < 2 || base > 36) {
             qWarning("Warning: QStringParser::number() invalid numeric base (%d)", base);
             base = 10;
@@ -257,7 +255,7 @@ class Q_CORE_EXPORT QStringParser
          std::string s1 = stream.str();
          const char *s2 = s1.c_str();
 
-         retval = T::fromUtf8(s2);
+         T retval = T::fromUtf8(s2);
 
          return retval;
       }
@@ -309,12 +307,65 @@ class Q_CORE_EXPORT QStringParser
       }
 
       template <typename T>
-      static QList<T> split(const T &str, QChar32 sep, SplitBehavior behavior = KeepEmptyParts,
+      static T section(const T &str, QChar32 separator, int firstSection, int lastSection = -1, SectionFlags flags = SectionDefault) {
+         return section(str, T(separator), firstSection, lastSection, flags);
+      }
+
+      template <typename T, int N>
+      static T section(const T &str, const char (&separator)[N], int firstSection, int lastSection = -1, SectionFlags flags = SectionDefault) {
+         return section(str, T(separator), firstSection, lastSection, flags);
+      }
+
+      template <typename T>
+      static T section(const T &str, const T &separator, int firstSection, int lastSection = -1, SectionFlags flags = SectionDefault);
+
+      template <typename T>
+      static QList<T> split(const T &str, QChar32 separator, SplitBehavior behavior = KeepEmptyParts,
                   Qt::CaseSensitivity cs = Qt::CaseSensitive);
 
       template <typename T>
-      static QList<T> split(const T &str, const T &sep, SplitBehavior behavior = KeepEmptyParts,
+      static QList<T> split(const T &str, const T &separator, SplitBehavior behavior = KeepEmptyParts,
                   Qt::CaseSensitivity cs = Qt::CaseSensitive);
+
+      //
+      template <typename R, typename T = QString8>
+      static R toInteger(const T &str, bool *ok = nullptr, int base = 10)
+      {
+         if (base != 0 && (base < 2 || base > 36)) {
+            qWarning("Warning: QStringParser::toInteger() invalid numeric base (%d)", base);
+            base = 10;
+         }
+
+         R retval;
+
+         std::istringstream stream(str.toLatin1().constData());
+         stream >> std::setbase(base);
+         stream >> retval;
+
+         return retval;
+      }
+
+      template <typename T = QString8>
+      static double toDouble(const T &str, bool *ok = nullptr)
+      {
+         double retval;
+
+         std::istringstream stream(str.toLatin1().constData());
+         stream >> retval;
+
+         return retval;
+      }
+
+      template <typename T = QString8>
+      static float toFloat(const T &str, bool *ok = nullptr)
+      {
+         float retval;
+
+         std::istringstream stream(str.toLatin1().constData());
+         stream >> retval;
+
+         return retval;
+      }
 
    private:
       struct ArgEscapeData {
@@ -596,8 +647,10 @@ class Q_CORE_EXPORT QStringParser
       }
 };
 
+Q_DECLARE_OPERATORS_FOR_FLAGS(QStringParser::SectionFlags)
+
 template <typename T, typename V>
-T QStringParser::join(const QList<T> &list, const V &sep)
+T QStringParser::join(const QList<T> &list, const V &separator)
 {
    T retval;
    bool isFirst = true;
@@ -607,7 +660,7 @@ T QStringParser::join(const QList<T> &list, const V &sep)
       if (isFirst) {
          isFirst = false;
       } else {
-         retval += sep;
+         retval += separator;
       }
 
       retval += value;
@@ -617,7 +670,102 @@ T QStringParser::join(const QList<T> &list, const V &sep)
 }
 
 template <typename T>
-QList<T> QStringParser::split(const T &str, QChar32 sep, SplitBehavior behavior, Qt::CaseSensitivity cs)
+T QStringParser::section(const T &str, const T &separator, int firstSection, int lastSection, SectionFlags flags)
+{
+   Qt::CaseSensitivity cs;
+
+   if (flags & SectionCaseInsensitiveSeps) {
+      cs = Qt::CaseInsensitive;
+
+   } else {
+      cs = Qt::CaseSensitive;
+
+   }
+
+   // QVector<QStringView>
+   auto sections = split(str, separator, SplitBehavior::KeepEmptyParts, cs);
+
+   const auto sectionsSize = sections.count();
+
+   if (sectionsSize == 0) {
+      return T();
+   }
+
+   if (! (flags & SectionFlag::SectionSkipEmpty)) {
+      if (firstSection < 0) {
+         firstSection += sectionsSize;
+      }
+
+      if (lastSection < 0) {
+         lastSection += sectionsSize;
+      }
+
+   } else {
+      int skip = 0;
+
+      for (const auto &item : sections) {
+         if (item.isEmpty()) {
+            skip++;
+         }
+      }
+
+      if (firstSection < 0) {
+         firstSection += sectionsSize - skip;
+      }
+
+      if (lastSection < 0) {
+         lastSection  += sectionsSize - skip;
+      }
+   }
+
+   if (firstSection >= sectionsSize || lastSection < 0 || firstSection > lastSection) {
+      return T();
+   }
+
+   T retval;
+
+   int tmp         = 0;
+   int first_index = firstSection;
+   int last_index  = lastSection;
+
+   for (int k = 0; tmp  <= lastSection && k < sectionsSize; ++k) {
+      const auto &item = sections.at(k);
+      const bool empty = item.isEmpty();
+
+      if (tmp  >= firstSection) {
+         if (tmp  == firstSection) {
+            first_index = k;
+         }
+
+         if (tmp  == lastSection) {
+            last_index = k;
+         }
+
+         if (tmp  > firstSection) {
+            retval += separator;
+         }
+
+         retval += item;
+      }
+
+      if (! empty || ! (flags & SectionFlag::SectionSkipEmpty)) {
+         tmp ++;
+      }
+   }
+
+   if ( (flags & SectionFlag::SectionIncludeLeadingSep) && first_index) {
+      retval.prepend(separator);
+   }
+
+   if ( (flags & SectionFlag::SectionIncludeTrailingSep) && last_index < sectionsSize - 1) {
+      retval += separator;
+   }
+
+   return retval;
+}
+
+template <typename T>
+QList<T> QStringParser::split(const T &str, QChar32 separator, SplitBehavior behavior, Qt::CaseSensitivity cs)
 {
    QList<T> retval;
 
@@ -626,16 +774,16 @@ QList<T> QStringParser::split(const T &str, QChar32 sep, SplitBehavior behavior,
 
    typename T::const_iterator iter;
 
-   while ( (iter = str.indexOfFast(sep, first_iter, cs)) != last_iter) {
+   while ( (iter = str.indexOfFast(separator, first_iter, cs)) != last_iter) {
 
-      if (first_iter != iter || behavior == KeepEmptyParts) {
+      if (first_iter != iter || behavior == SplitBehavior::KeepEmptyParts) {
          retval.append(T(first_iter, iter));
       }
 
       first_iter = ++iter;
    }
 
-   if (first_iter != last_iter || behavior == KeepEmptyParts) {
+   if (first_iter != last_iter || behavior == SplitBehavior::KeepEmptyParts) {
       retval.append(T(first_iter, last_iter));
    }
 
@@ -643,7 +791,7 @@ QList<T> QStringParser::split(const T &str, QChar32 sep, SplitBehavior behavior,
 }
 
 template <typename T>
-QList<T> QStringParser::split(const T &str, const T &sep, SplitBehavior behavior, Qt::CaseSensitivity cs)
+QList<T> QStringParser::split(const T &str, const T &separator, SplitBehavior behavior, Qt::CaseSensitivity cs)
 {
    QList<T> retval;
 
@@ -652,12 +800,12 @@ QList<T> QStringParser::split(const T &str, const T &sep, SplitBehavior behavior
 
    typename T::const_iterator iter;
 
-   int len   = sep.size();
+   int len   = separator.size();
    int extra = 0;
 
-   while ( (iter = str.indexOfFast(sep, first_iter + extra, cs)) != last_iter) {
+   while ( (iter = str.indexOfFast(separator, first_iter + extra, cs)) != last_iter) {
 
-      if (first_iter != iter || behavior == KeepEmptyParts) {
+      if (first_iter != iter || behavior == SplitBehavior::KeepEmptyParts) {
          retval.append(T(first_iter, iter));
       }
 
@@ -668,7 +816,7 @@ QList<T> QStringParser::split(const T &str, const T &sep, SplitBehavior behavior
       }
    }
 
-   if (first_iter != last_iter || behavior == KeepEmptyParts) {
+   if (first_iter != last_iter || behavior == SplitBehavior::KeepEmptyParts) {
       retval.append(T(first_iter, last_iter));
    }
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -33,10 +33,16 @@
 #include <iterator>
 
 #ifdef truncate
-#error qbytearray.h must be included before any header file that defines truncate
+#error Header file qbytearray.h must be included before any header file that defines truncate
 #endif
 
-QT_BEGIN_NAMESPACE
+#ifdef Q_OS_DARWIN
+   using CFDataRef = const struct __CFData *;
+
+#  ifdef __OBJC__
+   @class NSData;
+#  endif
+#endif
 
 Q_CORE_EXPORT char *qstrdup(const char *);
 
@@ -70,17 +76,11 @@ static inline int qstrcmp(const char *str1, const QByteArray &str2)
 
 inline int qstrncmp(const char *str1, const char *str2, uint len)
 {
-   return (str1 && str2) ? strncmp(str1, str2, len)
-          : (str1 ? 1 : (str2 ? -1 : 0));
+   return (str1 && str2) ? strncmp(str1, str2, len) : (str1 ? 1 : (str2 ? -1 : 0));
 }
 
 Q_CORE_EXPORT int qstricmp(const char *, const char *);
 Q_CORE_EXPORT int qstrnicmp(const char *, const char *, uint len);
-
-
-// BROOM - delete these when QString8 active, implemented in qvsnprintf.cpp
-Q_CORE_EXPORT int qvsnprintf(char *str, size_t n, const char *fmt, va_list ap);
-Q_CORE_EXPORT int qsnprintf(char *str, size_t n, const char *fmt, ...);
 
 // qChecksum: Internet checksum
 Q_CORE_EXPORT quint16 qChecksum(const char *s, uint len);
@@ -88,8 +88,8 @@ Q_CORE_EXPORT quint16 qChecksum(const char *s, uint len);
 class QByteRef;
 class QString;
 class QDataStream;
-template <typename T> class QList;
 
+template <typename T> class QList;
 typedef QArrayData QByteArrayData;
 
 template<int N> struct QStaticByteArrayData {
@@ -144,11 +144,23 @@ class Q_CORE_EXPORT QByteArray
 
    QByteArray(const char *, int size = -1);
    QByteArray(int size, char c);
-   QByteArray(const QByteArray &);
+
+   QByteArray(const QByteArray &other)
+      : d(other.d)
+   {
+      d->ref.ref();
+   }
+
+   QByteArray(QByteArray &&other)
+      : d(other.d)
+   {
+      other.d = Data::sharedNull();
+   }
+
    QByteArray(int size, Qt::Initialization);
 
    ~QByteArray() {
-      if (!d->ref.deref()) {
+      if (! d->ref.deref()) {
          Data::deallocate(d);
       }
    }
@@ -209,6 +221,29 @@ class Q_CORE_EXPORT QByteArray
    void truncate(int pos);
    void chop(int n);
 
+   void push_back(char c);
+   void push_back(const char *c);
+   void push_back(const QByteArray &a);
+   void push_front(char c);
+   void push_front(const char *c);
+   void push_front(const QByteArray &a);
+
+   inline int count() const {
+      return d->size;
+   }
+   int length() const {
+      return d->size;
+   }
+   bool isNull() const;
+
+   inline QByteArray(QByteArrayDataPtr dd)
+      : d(static_cast<Data *>(dd.ptr)) {
+   }
+
+   inline DataPtr &data_ptr() {
+      return d;
+   }
+
    QByteArray toLower() const;
    QByteArray toUpper() const;
 
@@ -230,9 +265,7 @@ class Q_CORE_EXPORT QByteArray
    QByteArray &insert(int i, const char *s, int len);
    QByteArray &insert(int i, const QByteArray &a);
 
-   // CopperSpice added 01/18/2014
    QByteArray &remove(char c);
-
    QByteArray &remove(int index, int len);
    QByteArray &replace(int index, int len, const char *s);
    QByteArray &replace(int index, int len, const char *s, int alen);
@@ -358,28 +391,20 @@ class Q_CORE_EXPORT QByteArray
    static QByteArray fromHex(const QByteArray &hexEncoded);
    static QByteArray fromPercentEncoding(const QByteArray &pctEncoded, char percent = '%');
 
-   void push_back(char c);
-   void push_back(const char *c);
-   void push_back(const QByteArray &a);
-   void push_front(char c);
-   void push_front(const char *c);
-   void push_front(const QByteArray &a);
+#if defined(Q_OS_MAC)
+    static QByteArray fromCFData(CFDataRef data);
+    static QByteArray fromRawCFData(CFDataRef data);
+    CFDataRef toCFData() const;
+    CFDataRef toRawCFData() const;
 
-   inline int count() const {
-      return d->size;
-   }
-   int length() const {
-      return d->size;
-   }
-   bool isNull() const;
+#if defined(__OBJC__)
+    static QByteArray fromNSData(const NSData *data);
+    static QByteArray fromRawNSData(const NSData *data);
+    NSData *toNSData() const;
+    NSData *toRawNSData() const;
+#endif
 
-   inline QByteArray(QByteArrayDataPtr dd)
-      : d(static_cast<Data *>(dd.ptr)) {
-   }
-
-   inline DataPtr &data_ptr() {
-      return d;
-   }
+#endif
 
  private:
    operator QNoImplicitBoolCast() const;
@@ -448,11 +473,6 @@ inline void QByteArray::detach()
 inline bool QByteArray::isDetached() const
 {
    return !d->ref.isShared();
-}
-
-inline QByteArray::QByteArray(const QByteArray &a) : d(a.d)
-{
-   d->ref.ref();
 }
 
 inline int QByteArray::capacity() const
@@ -817,12 +837,11 @@ inline QByteArray &QByteArray::setNum(float n, char f, int prec)
    return setNum(double(n), f, prec);
 }
 
-#if !defined(QT_NO_DATASTREAM)
 Q_CORE_EXPORT QDataStream &operator<<(QDataStream &, const QByteArray &);
 Q_CORE_EXPORT QDataStream &operator>>(QDataStream &, QByteArray &);
-#endif
 
-#ifndef QT_NO_COMPRESS
+
+//
 Q_CORE_EXPORT QByteArray qCompress(const uchar *data, int nbytes, int compressionLevel = -1);
 Q_CORE_EXPORT QByteArray qUncompress(const uchar *data, int nbytes);
 
@@ -835,15 +854,12 @@ inline QByteArray qUncompress(const QByteArray &data)
 {
    return qUncompress(reinterpret_cast<const uchar *>(data.constData()), data.size());
 }
-#endif
 
 Q_DECLARE_TYPEINFO(QByteArray, Q_MOVABLE_TYPE);
 Q_DECLARE_SHARED(QByteArray)
 
-QT_END_NAMESPACE
-
 #ifdef QT_USE_QSTRINGBUILDER
-#include <QtCore/qstring.h>
+#include <qstring.h>
 #endif
 
 #endif // QBYTEARRAY_H

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -75,6 +75,11 @@ class Q_CORE_EXPORT QMetaObject
 
    virtual QMetaMethod method(int index) const = 0;
    QMetaMethod method(const CSBentoAbstract &temp) const;
+
+   // alternate name for method()
+   QMetaMethod lookUpMethod(const CSBentoAbstract &temp) const {
+      return method(temp);
+   }
 
    virtual int methodCount() const = 0;
    int methodOffset() const;

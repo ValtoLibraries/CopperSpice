@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -28,9 +28,9 @@
 #include <qdebug.h>
 
 const QSsl::SslOptions QSslConfigurationPrivate::defaultSslOptions = QSsl::SslOptionDisableEmptyFragments
-                  | QSsl::SslOptionDisableLegacyRenegotiation
-                  | QSsl::SslOptionDisableCompression
-                  | QSsl::SslOptionDisableSessionPersistence;
+      | QSsl::SslOptionDisableLegacyRenegotiation
+      | QSsl::SslOptionDisableCompression
+      | QSsl::SslOptionDisableSessionPersistence;
 
 const char QSslConfiguration::NextProtocolSpdy3_0[] = "spdy/3";
 const char QSslConfiguration::NextProtocolHttp1_1[] = "http/1.1";
@@ -302,7 +302,8 @@ void QSslConfiguration::setDefaultConfiguration(const QSslConfiguration &configu
 }
 
 // internal
-bool QSslConfigurationPrivate::peerSessionWasShared(const QSslConfiguration &configuration) {
+bool QSslConfigurationPrivate::peerSessionWasShared(const QSslConfiguration &configuration)
+{
    return configuration.d->peerSessionShared;
 }
 

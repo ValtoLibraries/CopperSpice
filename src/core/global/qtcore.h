@@ -1,5 +1,6 @@
-#ifndef QTCORE_H
-#define QTCORE_H
+#ifndef QT_CORE_H
+#define QT_CORE_H
+
 #include <qfuture.h>
 #include <qfutureinterface.h>
 #include <qfuturesynchronizer.h>
@@ -90,7 +91,6 @@
 #include <qalgorithms.h>
 #include <qbitarray.h>
 #include <qbytearray.h>
-#include <qbytearraymatcher.h>
 #include <qcache.h>
 #include <qchar.h>
 #include <qcontainerfwd.h>
@@ -121,7 +121,6 @@
 #include <qstring.h>
 #include <qstringbuilder.h>
 #include <qstringlist.h>
-#include <qstringmatcher.h>
 #include <qtextboundaryfinder.h>
 #include <qtimeline.h>
 #include <qvarlengtharray.h>

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -37,10 +37,6 @@
 
 #include <qdialog_p.h>
 #include <limits.h>
-
-#if defined(QT_SOFTKEYS_ENABLED)
-#include <qaction.h>
-#endif
 
 QT_BEGIN_NAMESPACE
 
@@ -79,10 +75,6 @@ void QProgressDialog::init(const QString &labelText, const QString &cancelButton
 
 #ifndef QT_NO_SHORTCUT
    escapeShortcut = 0;
-#endif
-
-#ifdef QT_SOFTKEYS_ENABLED
-   cancelAction  = 0;
 #endif
 
    shown_once   = false;
@@ -230,18 +222,7 @@ void QProgressDialog::setCancelButton(QPushButton *newButton)
    }
 
    if (m_cancelButton) {
-
-#if !defined(QT_SOFTKEYS_ENABLED)
       m_cancelButton->show();
-#else
-
-      cancelAction = new QAction(cancelButton->text(), cancelButton);
-      cancelAction->setSoftKeyRole(QAction::NegativeSoftKey);
-
-      connect(cancelAction, SIGNAL(triggered()), this, SIGNAL(canceled()));
-      addAction(cancelAction);
-#endif
-
    }
 }
 
@@ -286,10 +267,6 @@ void QProgressDialog::setCancelButtonText(const QString &cancelButtonText)
 
       if (m_cancelButton) {
          m_cancelButton->setText(cancelButtonText);
-
-#ifdef QT_SOFTKEYS_ENABLED
-         cancelAction->setText(cancelButtonText);
-#endif
 
       } else {
          setCancelButton(new QPushButton(cancelButtonText, this));

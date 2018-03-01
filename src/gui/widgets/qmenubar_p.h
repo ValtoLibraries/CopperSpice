@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -29,8 +29,6 @@
 #ifdef Q_WS_X11
 #include <qabstractplatformmenubar_p.h>
 #endif
-
-QT_BEGIN_NAMESPACE
 
 #ifndef QT_NO_MENUBAR
 class QToolBar;
@@ -168,10 +166,6 @@ class QMenuBarPrivate : public QWidgetPrivate
    OSMenuRef macMenu();
 #endif
 
-#ifdef QT_SOFTKEYS_ENABLED
-   QAction *menuBarAction;
-#endif
-
 #ifdef Q_WS_X11
    void updateCornerWidgetToolBar();
    QToolBar *cornerWidgetToolBar;
@@ -181,7 +175,5 @@ class QMenuBarPrivate : public QWidgetPrivate
 };
 
 #endif // QT_NO_MENUBAR
-
-QT_END_NAMESPACE
 
 #endif // QMENUBAR_P_H

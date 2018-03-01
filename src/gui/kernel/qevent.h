@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -23,19 +23,19 @@
 #ifndef QEVENT_H
 #define QEVENT_H
 
-#include <QtGui/qwindowdefs.h>
-#include <QtCore/qobject.h>
-#include <QtGui/qregion.h>
-#include <QtCore/qnamespace.h>
-#include <QtCore/qstring.h>
-#include <QtGui/qkeysequence.h>
-#include <QtCore/qcoreevent.h>
-#include <QtGui/qmime.h>
-#include <QtGui/qdrag.h>
-#include <QtCore/qvariant.h>
-#include <QtCore/qmap.h>
-#include <QtCore/qset.h>
-#include <QtCore/qfile.h>
+#include <qwindowdefs.h>
+#include <qobject.h>
+#include <qregion.h>
+#include <qnamespace.h>
+#include <qstring.h>
+#include <qkeysequence.h>
+#include <qcoreevent.h>
+#include <qmime.h>
+#include <qdrag.h>
+#include <qvariant.h>
+#include <qmap.h>
+#include <qset.h>
+#include <qfile.h>
 
 QT_BEGIN_NAMESPACE
 

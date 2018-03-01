@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -1990,13 +1990,6 @@ void QVariant::load(QDataStream &s)
 
    quint32 u;
    s >> u;
-
-   if (s.version() < QDataStream::Qt_4_0) {
-      if (u >= MapFromThreeCount) {
-         return;
-      }
-      u = map_from_three[u];
-   }
 
    qint8 is_null = false;
    if (s.version() >= QDataStream::Qt_4_2) {

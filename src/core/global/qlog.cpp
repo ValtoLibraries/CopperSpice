@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -20,8 +20,10 @@
 *
 ***********************************************************************/
 
-#include <qlog.h>
 #include <cstdlib>
+#include <cstdio>
+
+#include <qlog.h>
 
 #if defined(Q_OS_WIN)
 #include <qt_windows.h>
@@ -160,10 +162,10 @@ void qt_message_output(QtMsgType msgType, const char *buf)
 static void qEmergencyOut(QtMsgType msgType, const char *msg, va_list ap)
 {
    char emergency_buf[256] = { '\0' };
-   emergency_buf[255] = '\0';
+   emergency_buf[255]      = '\0';
 
    if (msg) {
-      qvsnprintf(emergency_buf, 255, msg, ap);
+      std::vsnprintf(emergency_buf, 255, msg, ap);
    }
 
    qt_message_output(msgType, emergency_buf);
@@ -182,11 +184,11 @@ static void qt_message(QtMsgType msgType, const char *msg, va_list ap)
    if (msg) {
       QT_TRY {
          buf = QString().vsprintf(msg, ap).toLocal8Bit();
-      } QT_CATCH(const std::bad_alloc &)  {
 
+      } QT_CATCH(const std::bad_alloc &)  {
          qEmergencyOut(msgType, msg, ap);
 
-         // do not rethrow - we use qWarning and friends in destructors.
+         // do not rethrow, use qWarning and friends in destructors
          return;
       }
    }

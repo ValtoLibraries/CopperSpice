@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -30,7 +30,7 @@
 
 #ifndef QT_NO_NETWORKDISKCACHE
 
-QT_BEGIN_NAMESPACE
+
 
 class QFile;
 
@@ -39,6 +39,7 @@ class QCacheItem
  public:
    QCacheItem() : file(0) {
    }
+
    ~QCacheItem() {
       reset();
    }
@@ -90,7 +91,6 @@ class QNetworkDiskCachePrivate : public QAbstractNetworkCachePrivate
    Q_DECLARE_PUBLIC(QNetworkDiskCache)
 };
 
-QT_END_NAMESPACE
 
 #endif // QT_NO_NETWORKDISKCACHE
 

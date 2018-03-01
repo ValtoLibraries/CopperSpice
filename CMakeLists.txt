@@ -28,7 +28,7 @@ endif()
 
 set(BUILD_MAJOR "1")
 set(BUILD_MINOR "4")
-set(BUILD_MICRO "4")
+set(BUILD_MICRO "5")
 set(BUILD_ABI ${BUILD_MAJOR}.${BUILD_MINOR})
 
 # required
@@ -44,8 +44,12 @@ set(PACKAGE_STRING "copperspice ${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_MICRO}")
 set(PACKAGE_TARNAME "copperspice")
 set(PACKAGE_BUGREPORT "info@copperspice.com")
 set(PACKAGE_URL "http://www.copperspice.com/")
+
+# used in cs_build_info.h.in
 set(HEX_VERSION "0x0${BUILD_MAJOR}0${BUILD_MINOR}0${BUILD_MICRO}")
 set(VERSION "${PACKAGE_VERSION}")
+
+# used in cs_build_info.h.in
 set(prefix "${CMAKE_INSTALL_PREFIX}")
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "(GNU|Clang|AppleClang)")
@@ -154,8 +158,16 @@ message(STATUS "Search for packages:\n")
 find_package(OpenSSL 1.0)
 set_package_properties(OpenSSL PROPERTIES
     PURPOSE "Required for HTTPS support"
-    DESCRIPTION "Support for secure network communications (SSL and TLS)"
+    DESCRIPTION "Support for secure network communications using OpenSSL for SSL and TLS"
     URL "http://openssl.org"
+    TYPE RECOMMENDED
+)
+
+find_package(Security)
+set_package_properties(Security PROPERTIES
+    PURPOSE "Required for HTTPS support"
+    DESCRIPTION "Support for secure network communications using Secure Trasnport for SSL and TLS"
+    URL "https://developer.apple.com/documentation/security/secure_transport"
     TYPE RECOMMENDED
 )
 

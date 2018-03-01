@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -47,7 +47,6 @@
 #include <qcombobox_p.h>
 #include <qabstractitemmodel_p.h>
 #include <qabstractscrollarea_p.h>
-#include <qsoftkeymanager_p.h>
 #include <qdebug.h>
 
 #ifdef Q_WS_X11
@@ -576,15 +575,7 @@ void QComboBoxPrivateContainer::setItemView(QAbstractItemView *itemView)
    connect(view->verticalScrollBar(), SIGNAL(rangeChanged(int, int)), this, SLOT(updateScrollers()));
 #endif
 
-   connect(view, SIGNAL(destroyed()), this, SLOT(viewDestroyed()));
-
-#ifdef QT_SOFTKEYS_ENABLED
-   selectAction = QSoftKeyManager::createKeyedAction(QSoftKeyManager::SelectSoftKey, Qt::Key_Select, itemView);
-   cancelAction = QSoftKeyManager::createKeyedAction(QSoftKeyManager::CancelSoftKey, Qt::Key_Escape, itemView);
-   addAction(selectAction);
-   addAction(cancelAction);
-#endif
-}
+   connect(view, SIGNAL(destroyed()), this, SLOT(viewDestroyed()));}
 
 /*!
     Returns the spacing between the items in the view.
@@ -636,14 +627,10 @@ void QComboBoxPrivateContainer::changeEvent(QEvent *e)
 {
    if (e->type() == QEvent::StyleChange) {
       QStyleOptionComboBox opt = comboStyleOption();
+
       view->setMouseTracking(combo->style()->styleHint(QStyle::SH_ComboBox_ListMouseTracking, &opt, combo) ||
                              combo->style()->styleHint(QStyle::SH_ComboBox_Popup, &opt, combo));
       setFrameStyle(combo->style()->styleHint(QStyle::SH_ComboBox_PopupFrameStyle, &opt, combo));
-#ifdef QT_SOFTKEYS_ENABLED
-   } else if (e->type() == QEvent::LanguageChange) {
-      selectAction->setText(QSoftKeyManager::standardSoftKeyText(QSoftKeyManager::SelectSoftKey));
-      cancelAction->setText(QSoftKeyManager::standardSoftKeyText(QSoftKeyManager::CancelSoftKey));
-#endif
    }
 
    QWidget::changeEvent(e);

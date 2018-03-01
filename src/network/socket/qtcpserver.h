@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -28,7 +28,7 @@
 #include <qhostaddress.h>
 #include <QScopedPointer>
 
-QT_BEGIN_NAMESPACE
+
 
 class QTcpServerPrivate;
 class QTcpSocket;
@@ -59,7 +59,7 @@ class Q_NETWORK_EXPORT QTcpServer : public QObject
    qintptr socketDescriptor() const;
    bool setSocketDescriptor(qintptr socketDescriptor);
 
-   bool waitForNewConnection(int msec = 0, bool *timedOut = 0);
+   bool waitForNewConnection(int msec = 0, bool *timedOut = nullptr);
    virtual bool hasPendingConnections() const;
    virtual QTcpSocket *nextPendingConnection();
 
@@ -93,6 +93,6 @@ class Q_NETWORK_EXPORT QTcpServer : public QObject
    Q_DECLARE_PRIVATE(QTcpServer)
 };
 
-QT_END_NAMESPACE
+
 
 #endif // QTCPSERVER_H

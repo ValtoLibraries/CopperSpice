@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -180,6 +180,20 @@ bool QLocalServer::listen(const QString &name)
 }
 
 /*!
+bool QLocalServer::listen(qintptr socketDescriptor)
+{
+    Q_D(QLocalServer);
+    if (isListening()) {
+        qWarning("QLocalServer::listen() called when already listening");
+        return false;
+    }
+    d->serverName.clear();
+    d->fullServerName.clear();
+    if (!d->listen(socketDescriptor)) {
+        return false;
+    }
+    return true;
+}
     Returns the maximum number of pending accepted connections.
     The default is 30.
 

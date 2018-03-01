@@ -33,6 +33,7 @@ set(CORE_PUBLIC_INCLUDES
     QTextStreamFunction
     QTextStreamManipulator
     QUrl
+    QUrlQuery
 )
 
 set(CORE_INCLUDES
@@ -70,6 +71,7 @@ set(CORE_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/io/qtextstreammanipulator.h
     ${CMAKE_CURRENT_SOURCE_DIR}/io/qts.h
     ${CMAKE_CURRENT_SOURCE_DIR}/io/qurl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/io/qurlquery.h
 )
 
 set(CORE_PRIVATE_INCLUDES
@@ -88,6 +90,7 @@ set(CORE_PRIVATE_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/io/qresource_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/io/qresource_iterator_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/io/qurltlds_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/io/qurl_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/io/qtldurl_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/io/qsavefile_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/io/qsettings_p.h
@@ -104,6 +107,7 @@ set(CORE_PRIVATE_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/io/qfilesystemmetadata_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/io/qfilesystemiterator_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/io/qtemporaryfile_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/io/qwindowspipereader_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/io/qwindowspipewriter_p.h
 )
 
@@ -130,6 +134,9 @@ set(CORE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/io/qresource.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/io/qresource_iterator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/io/qurl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/io/qurlidna.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/io/qurlrecode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/io/qurlquery.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/io/qsavefile.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/io/qsettings.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/io/qstandardpaths.cpp
@@ -140,20 +147,10 @@ set(CORE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/io/qfilesystemengine.cpp
 )
 
-## FIXME platform-specific
-# qfsfileengine_unix.cpp
-# qprocess_unix.cpp
-# qfilesystemwatcher_fsevents_p.h
-# qsettings_mac.cpp
-# qfilesystemwatcher_fsevents.cpp
-# qfilesystemwatcher_inotify_p.h
-# qfilesystemwatcher_dnotify_p.h
-# qfilesystemwatcher_kqueue.cpp
-# qfilesystemwatcher_kqueue_p.h
-
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     set(CORE_SOURCES
         ${CORE_SOURCES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/io/qwindowspipereader.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/io/qwindowspipewriter.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/io/qfilesystemiterator_win.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/io/qsettings_win.cpp
@@ -173,6 +170,7 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         ${CMAKE_CURRENT_SOURCE_DIR}/io/qfilesystemwatcher_dnotify.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/io/qfilesystemiterator_unix.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/io/qstandardpaths_unix.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/io/forkfd_qt.cpp
     )
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "(OpenBSD|FreeBSD|NetBSD)")
     set(CORE_SOURCES
@@ -183,6 +181,7 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "(OpenBSD|FreeBSD|NetBSD)")
         ${CMAKE_CURRENT_SOURCE_DIR}/io/qfilesystemwatcher_kqueue.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/io/qfilesystemiterator_unix.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/io/qstandardpaths_unix.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/io/forkfd_qt.cpp
     )
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(CORE_SOURCES
@@ -195,5 +194,7 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
         ${CMAKE_CURRENT_SOURCE_DIR}/io/qprocess_unix.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/io/qsettings_mac.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/io/qstandardpaths_mac.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/io/forkfd_qt.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/io/qurl_mac.mm
     )
 endif()

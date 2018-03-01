@@ -8,7 +8,6 @@ CORE_PUBLIC_INCLUDES += \
 	QBitRef \
 	QByteArray \
 	QByteRef \
-	QByteArrayMatcher \
 	QCache \
 	QChar \
 	QCharRef \
@@ -43,6 +42,7 @@ CORE_PUBLIC_INCLUDES += \
 	QMap \
 	QMapIterator \
 	QMargins \
+	QMessageAuthenticationCode \
 	QMultiHash \
 	QMultiMap \
 	QMutableHashIterator \
@@ -78,7 +78,6 @@ CORE_PUBLIC_INCLUDES += \
 	QStringBuilder \
 	QStringList \
 	QStringListIterator \
-	QStringMatcher \
 	QStringRef \
 	QSystemLocale \
 	QTextBoundaryFinder \
@@ -102,7 +101,6 @@ CORE_TOOLS_INCLUDES = \
 	qbitref.h \
 	qbytearray.h \
 	qbyteref.h \
-	qbytearraymatcher.h \
 	qcache.h \
 	qchar.h \
 	qcharref.h \
@@ -141,6 +139,7 @@ CORE_TOOLS_INCLUDES = \
 	qmapfunc.h \
 	qmapiterator.h \
 	qmargins.h \
+	qmessageauthenticationcode.h \
 	qmultihash.h \
 	qmultimap.h \
 	qmutablehashiterator.h \
@@ -178,7 +177,6 @@ CORE_TOOLS_INCLUDES = \
 	qstringbuilder.h \
 	qstringlist.h \
 	qstringlistiterator.h \
-	qstringmatcher.h \
 	qstringref.h \
 	qsystemlocale.h \
 	qtalgorithms.h \
@@ -217,7 +215,6 @@ lib_libCsCore@BUILD_ABI@_la_SOURCES += \
 	src/core/tools/qarraydata.cpp \
 	src/core/tools/qbitarray.cpp \
 	src/core/tools/qbytearray.cpp \
-	src/core/tools/qbytearraymatcher.cpp \
 	src/core/tools/qcryptographichash.cpp \
 	src/core/tools/qdatetime.cpp \
 	src/core/tools/qeasingcurve.cpp \
@@ -233,6 +230,7 @@ lib_libCsCore@BUILD_ABI@_la_SOURCES += \
 	src/core/tools/qpoint.cpp \
 	src/core/tools/qmap.cpp \
 	src/core/tools/qmargins.cpp \
+	src/core/tools/qmessageauthenticationcode.cpp \
 	src/core/tools/qcontiguouscache.cpp \
 	src/core/tools/qcommandlineoption.cpp \
 	src/core/tools/qcommandlineparser.cpp \
@@ -249,7 +247,6 @@ lib_libCsCore@BUILD_ABI@_la_SOURCES += \
 	src/core/tools/qtextboundaryfinder.cpp \
 	src/core/tools/qtimeline.cpp \
 	src/core/tools/qvector.cpp \
-	src/core/tools/qvsnprintf.cpp \
 	src/3rdparty/harfbuzz/src/harfbuzz-buffer.c \
 	src/3rdparty/harfbuzz/src/harfbuzz-gdef.c \
 	src/3rdparty/harfbuzz/src/harfbuzz-gsub.c \
@@ -260,11 +257,6 @@ lib_libCsCore@BUILD_ABI@_la_SOURCES += \
 	src/3rdparty/harfbuzz/src/harfbuzz-shaper-all.cpp \
 	src/core/tools/qharfbuzz.cpp
 
-
-# FIXME platform specific
-#  qelapsedtimer_mac.cpp
-#  qlocale_mac.mm
-#  qelapsedtimer_generic.cpp
 
 if OSTYPE_WIN
 lib_libCsCore@BUILD_ABI@_la_SOURCES += \
@@ -280,15 +272,17 @@ endif
 
 if OSTYPE_BSD
 lib_libCsCore@BUILD_ABI@_la_SOURCES += \
-        src/core/tools/qelapsedtimer_unix.cpp \
-        src/core/tools/qlocale_unix.cpp
+	src/core/tools/qelapsedtimer_unix.cpp \
+	src/core/tools/qlocale_unix.cpp
 endif
 
 
 if OSTYPE_DARWIN
 lib_libCsCore@BUILD_ABI@_la_SOURCES += \
 	src/core/tools/qelapsedtimer_mac.cpp \
-	src/core/tools/qlocale_mac.mm
+	src/core/tools/qlocale_mac.mm \
+	src/core/tools/qbytearray_mac.mm \
+	src/core/tools/qstring_mac.mm
 endif
 
 
@@ -296,26 +290,35 @@ noinst_HEADERS+=$(patsubst %,src/core/tools/%,$(CORE_TOOLS_INCLUDES)) \
 		$(patsubst %,src/core/tools/%,$(CORE_TOOLS_PRIVATE_INCLUDES)) \
 		src/3rdparty/md5/md5.h \
 		src/3rdparty/md4/md4.h \
-	        src/3rdparty/harfbuzz/src/harfbuzz-buffer-private.h \
-	        src/3rdparty/harfbuzz/src/harfbuzz-buffer.h \
-	        src/3rdparty/harfbuzz/src/harfbuzz-dump.h \
-	        src/3rdparty/harfbuzz/src/harfbuzz-external.h \
-	        src/3rdparty/harfbuzz/src/harfbuzz-gdef.h \
-	        src/3rdparty/harfbuzz/src/harfbuzz-gdef-private.h \
-	        src/3rdparty/harfbuzz/src/harfbuzz-global.h \
-	        src/3rdparty/harfbuzz/src/harfbuzz-gpos.h \
-	        src/3rdparty/harfbuzz/src/harfbuzz-gpos-private.h \
-	        src/3rdparty/harfbuzz/src/harfbuzz-gsub-private.h \
-	        src/3rdparty/harfbuzz/src/harfbuzz-gsub.h \
-	        src/3rdparty/harfbuzz/src/harfbuzz-impl.h \
-	        src/3rdparty/harfbuzz/src/harfbuzz.h \
-	        src/3rdparty/harfbuzz/src/harfbuzz-open-private.h \
-	        src/3rdparty/harfbuzz/src/harfbuzz-open.h \
-	        src/3rdparty/harfbuzz/src/harfbuzz-shape.h \
-	        src/3rdparty/harfbuzz/src/harfbuzz-shaper-private.h \
-	        src/3rdparty/harfbuzz/src/harfbuzz-shaper.h \
-	        src/3rdparty/harfbuzz/src/harfbuzz-stream-private.h \
-	        src/3rdparty/harfbuzz/src/harfbuzz-stream.h
+		src/3rdparty/harfbuzz/src/harfbuzz-buffer-private.h \
+		src/3rdparty/harfbuzz/src/harfbuzz-buffer.h \
+		src/3rdparty/harfbuzz/src/harfbuzz-dump.h \
+		src/3rdparty/harfbuzz/src/harfbuzz-external.h \
+		src/3rdparty/harfbuzz/src/harfbuzz-gdef.h \
+		src/3rdparty/harfbuzz/src/harfbuzz-gdef-private.h \
+		src/3rdparty/harfbuzz/src/harfbuzz-global.h \
+		src/3rdparty/harfbuzz/src/harfbuzz-gpos.h \
+		src/3rdparty/harfbuzz/src/harfbuzz-gpos-private.h \
+		src/3rdparty/harfbuzz/src/harfbuzz-gsub-private.h \
+		src/3rdparty/harfbuzz/src/harfbuzz-gsub.h \
+		src/3rdparty/harfbuzz/src/harfbuzz-impl.h \
+		src/3rdparty/harfbuzz/src/harfbuzz.h \
+		src/3rdparty/harfbuzz/src/harfbuzz-open-private.h \
+		src/3rdparty/harfbuzz/src/harfbuzz-open.h \
+		src/3rdparty/harfbuzz/src/harfbuzz-shape.h \
+		src/3rdparty/harfbuzz/src/harfbuzz-shaper-private.h \
+		src/3rdparty/harfbuzz/src/harfbuzz-shaper.h \
+		src/3rdparty/harfbuzz/src/harfbuzz-stream-private.h \
+		src/3rdparty/harfbuzz/src/harfbuzz-stream.h \
+		src/3rdparty/rfc6234/sha.h \
+		src/3rdparty/rfc6234/sha-private.h \
+		src/3rdparty/sha3/brg_endian.h \
+		src/3rdparty/sha3/KeccakSponge.h \
+		src/3rdparty/sha3/KeccakNISTInterface.h \
+		src/3rdparty/sha3/KeccakF-1600-int-set.h \
+		src/3rdparty/sha3/KeccakF-1600-interface.h \
+		src/3rdparty/sha3/KeccakF-1600-opt32-settings.h \
+		src/3rdparty/sha3/KeccakF-1600-opt64-settings.h
 
 
 EXTRA_DIST+=src/3rdparty/md5/md5.cpp \
@@ -323,7 +326,6 @@ EXTRA_DIST+=src/3rdparty/md5/md5.cpp \
 	    src/3rdparty/sha1/sha1.cpp \
 	    src/3rdparty/easing/easing.cpp \
 	    src/core/tools/qchar.cpp \
-	    src/core/tools/qstringmatcher.cpp \
 	    src/core/tools/qunicodetables.cpp \
 	    src/3rdparty/harfbuzz/src/harfbuzz-indic.cpp \
 	    src/3rdparty/harfbuzz/src/harfbuzz-shaper-all.cpp \
@@ -345,5 +347,16 @@ EXTRA_DIST+=src/3rdparty/md5/md5.cpp \
 	    src/3rdparty/harfbuzz/src/harfbuzz-open.c \
 	    src/3rdparty/harfbuzz/src/harfbuzz-stream.c \
 	    src/3rdparty/harfbuzz/src/harfbuzz-thai.c \
-	    src/3rdparty/harfbuzz/src/harfbuzz-tibetan.c
+	    src/3rdparty/harfbuzz/src/harfbuzz-tibetan.c \
+	    src/3rdparty/rfc6234/sha224-256.c \
+	    src/3rdparty/rfc6234/sha384-512.c \
+	    src/3rdparty/sha3/KeccakSponge.c \
+	    src/3rdparty/sha3/KeccakNISTInterface.c \
+	    src/3rdparty/sha3/KeccakF-1600-opt32.c \
+	    src/3rdparty/sha3/KeccakF-1600-opt64.c \
+	    src/3rdparty/sha3/KeccakF-1600-32-rvk.macros \
+	    src/3rdparty/sha3/KeccakF-1600-32.macros \
+	    src/3rdparty/sha3/KeccakF-1600-64.macros \
+	    src/3rdparty/sha3/KeccakF-1600-unrolling.macros
+
 

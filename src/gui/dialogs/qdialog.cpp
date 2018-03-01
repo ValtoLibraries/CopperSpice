@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -214,11 +214,6 @@ int QDialog::exec()
    setAttribute(Qt::WA_ShowModal, true);
    setResult(0);
 
-   bool showSystemDialogFullScreen = false;
-   if (showSystemDialogFullScreen) {
-      setWindowFlags(windowFlags() | Qt::WindowSoftkeysVisibleHint);
-      setWindowState(Qt::WindowFullScreen);
-   }
    show();
 
 #ifdef Q_OS_MAC
@@ -228,7 +223,9 @@ int QDialog::exec()
    QEventLoop eventLoop;
    d->eventLoop = &eventLoop;
    QPointer<QDialog> guard = this;
+
    (void) eventLoop.exec(QEventLoop::DialogExec);
+
    if (guard.isNull()) {
       return QDialog::Rejected;
    }

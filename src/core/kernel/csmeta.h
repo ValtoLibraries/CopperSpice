@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -103,6 +103,10 @@ class Q_CORE_EXPORT QMetaMethod
    Attributes attributes() const;
 
    bool compare(const CsSignal::Internal::BentoAbstract &method) const;
+
+   template <typename SignalClass, typename ...SignalArgs>
+   static QMetaMethod fromSignal(void (SignalClass::* signalMethod)(SignalArgs ...) );
+
    const CSBentoAbstract *getBentoBox() const;
 
    const QMetaObject *getMetaObject() const;
@@ -272,6 +276,21 @@ class Q_CORE_EXPORT QMetaProperty
 };
 
 // **
+
+template <typename SignalClass, typename ...SignalArgs>
+QMetaMethod QMetaMethod::fromSignal(void (SignalClass::* signalMethod)(SignalArgs ...) )
+{
+   const auto &metaObj = SignalClass::staticMetaObject();
+
+   CSBento<void(SignalClass::*)(SignalArgs ...)> tmp = CSBento<void(SignalClass::*)(SignalArgs ...)>(signalMethod);
+   QMetaMethod testMethod = metaObj.lookUpMethod(tmp);
+
+   if (testMethod.methodType() == QMetaMethod::Signal) {
+      return testMethod;
+   }
+
+   return QMetaMethod();
+}
 
 // QMetaMethod::invoke moved to csobject_internal.h becasue Invoke calls methods in QObject
 // template<class ...Ts>
@@ -472,6 +491,9 @@ const char *cs_typeName_internal<const T &>::typeName()
 template<class T1>
 class QDeclarativeListProperty;
 
+template <typename S>
+class QRegularExpression;
+
 // declare here, register in csObject_private.cpp
 CS_DECLARE_CLASS(QAbstractState)
 CS_DECLARE_CLASS(QColor)
@@ -512,7 +534,6 @@ CS_DECLARE_CLASS(QRect)
 CS_DECLARE_CLASS(QRectF)
 CS_DECLARE_CLASS(QRegion)
 CS_DECLARE_CLASS(QRegExp)
-CS_DECLARE_CLASS(QRegularExpression)
 CS_DECLARE_CLASS(QSize)
 CS_DECLARE_CLASS(QSizeF)
 CS_DECLARE_CLASS(QSizePolicy)
@@ -544,6 +565,7 @@ CS_REGISTER_TEMPLATE(QList)
 CS_REGISTER_TEMPLATE(QMap)
 CS_REGISTER_TEMPLATE(QMultiMap)
 CS_REGISTER_TEMPLATE(QQueue)
+CS_REGISTER_TEMPLATE(QRegularExpression)
 CS_REGISTER_TEMPLATE(QSet)
 CS_REGISTER_TEMPLATE(QStack)
 CS_REGISTER_TEMPLATE(QVector)

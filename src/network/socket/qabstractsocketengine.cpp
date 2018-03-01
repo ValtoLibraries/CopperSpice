@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -109,11 +109,11 @@ QAbstractSocketEngine *QAbstractSocketEngine::createSocketEngine(QAbstractSocket
    return new QNativeSocketEngine(parent);
 }
 
-QAbstractSocketEngine *QAbstractSocketEngine::createSocketEngine(qintptr socketDescripter, QObject *parent)
+QAbstractSocketEngine *QAbstractSocketEngine::createSocketEngine(qintptr socketDescriptor, QObject *parent)
 {
    QMutexLocker locker(&socketHandlers()->mutex);
    for (int i = 0; i < socketHandlers()->size(); i++) {
-      if (QAbstractSocketEngine *ret = socketHandlers()->at(i)->createSocketEngine(socketDescripter, parent)) {
+      if (QAbstractSocketEngine *ret = socketHandlers()->at(i)->createSocketEngine(socketDescriptor, parent)) {
          return ret;
       }
    }
@@ -166,8 +166,9 @@ void QAbstractSocketEngine::exceptionNotification()
 
 void QAbstractSocketEngine::closeNotification()
 {
-    if (QAbstractSocketEngineReceiver *receiver = d_func()->receiver)
-        receiver->closeNotification();
+   if (QAbstractSocketEngineReceiver *receiver = d_func()->receiver) {
+      receiver->closeNotification();
+   }
 }
 
 void QAbstractSocketEngine::connectionNotification()

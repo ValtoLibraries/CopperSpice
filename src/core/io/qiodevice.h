@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -23,8 +23,8 @@
 #ifndef QIODEVICE_H
 #define QIODEVICE_H
 
-#include <QtCore/qobject.h>
-#include <QtCore/qstring.h>
+#include <qobject.h>
+#include <qstring.h>
 #include <QScopedPointer>
 
 #ifdef open
@@ -40,15 +40,15 @@ class Q_CORE_EXPORT QIODevice : public QObject
 {
    CORE_CS_OBJECT(QIODevice)
 
- public:   
+ public:
    enum OpenModeFlag {
-      NotOpen = 0x0000,
-      ReadOnly = 0x0001,
-      WriteOnly = 0x0002,
-      ReadWrite = ReadOnly | WriteOnly,
-      Append = 0x0004,
-      Truncate = 0x0008,
-      Text = 0x0010,
+      NotOpen    = 0x0000,
+      ReadOnly   = 0x0001,
+      WriteOnly  = 0x0002,
+      ReadWrite  = ReadOnly | WriteOnly,
+      Append     = 0x0004,
+      Truncate   = 0x0008,
+      Text       = 0x0010,
       Unbuffered = 0x0020
    };
    using OpenMode = QFlags<OpenModeFlag>;

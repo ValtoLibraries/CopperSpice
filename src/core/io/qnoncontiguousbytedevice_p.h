@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -41,10 +41,12 @@ class Q_CORE_EXPORT QNonContiguousByteDevice : public QObject
    virtual bool advanceReadPointer(qint64 amount) = 0;
    virtual bool atEnd() = 0;
    virtual bool reset() = 0;
+
    void disableReset();
    bool isResetDisabled() {
       return resetDisabled;
    }
+
    virtual qint64 size() = 0;
    virtual qint64 pos() {
        return -1;
@@ -60,7 +62,7 @@ class Q_CORE_EXPORT QNonContiguousByteDevice : public QObject
  protected:
    QNonContiguousByteDevice();
 
-   bool resetDisabled;  
+   bool resetDisabled;
 };
 
 class Q_CORE_EXPORT QNonContiguousByteDeviceFactory
@@ -69,17 +71,22 @@ class Q_CORE_EXPORT QNonContiguousByteDeviceFactory
    static QNonContiguousByteDevice *create(QIODevice *device);
    static QNonContiguousByteDevice *create(QByteArray *byteArray);
    static QNonContiguousByteDevice *create(QSharedPointer<QRingBuffer> ringBuffer);
+
+   static QSharedPointer<QNonContiguousByteDevice> createShared(QIODevice *device);
+   static QSharedPointer<QNonContiguousByteDevice> createShared(QByteArray *byteArray);
+   static QSharedPointer<QNonContiguousByteDevice> createShared(QSharedPointer<QRingBuffer> ringBuffer);
+
    static QIODevice *wrap(QNonContiguousByteDevice *byteDevice);
 };
 
 // the actual implementations
-//
 
 class QNonContiguousByteDeviceByteArrayImpl : public QNonContiguousByteDevice
 {
  public:
    QNonContiguousByteDeviceByteArrayImpl(QByteArray *ba);
    ~QNonContiguousByteDeviceByteArrayImpl();
+
    const char *readPointer(qint64 maximumLength, qint64 &len) override;
    bool advanceReadPointer(qint64 amount) override;
    bool atEnd() override;

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -103,7 +103,7 @@ uint qHash(const HashStringList &list)
 {
    if (list.m_hash & 0x80000000) {
       uint hash = 0;
-      foreach (const HashString & qs, list.m_list) {
+      for (const HashString & qs : list.m_list) {
          hash ^= qHash(qs) ^ 0x0ad9f526;
          hash = ((hash << 13) & 0x0fffffff) | (hash >> 15);
       }
@@ -120,6 +120,7 @@ struct Namespace {
       classDef(this),
       hasTrFunctions(false), complained(false) {
    }
+
    ~Namespace() {
       qDeleteAll(children);
    }

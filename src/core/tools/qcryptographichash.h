@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -23,9 +23,7 @@
 #ifndef QCRYPTOGRAPHICHASH_H
 #define QCRYPTOGRAPHICHASH_H
 
-#include <QtCore/qbytearray.h>
-
-QT_BEGIN_NAMESPACE
+#include <qbytearray.h>
 
 class QCryptographicHashPrivate;
 class QIODevice;
@@ -36,10 +34,22 @@ class Q_CORE_EXPORT QCryptographicHash
    enum Algorithm {
       Md4,
       Md5,
-      Sha1
+      Sha1,
+      Sha224,
+      Sha256,
+      Sha384,
+      Sha512,
+      Keccak_224,
+      Keccak_256,
+      Keccak_384,
+      Keccak_512,
+      Sha3_224,
+      Sha3_256,
+      Sha3_384,
+      Sha3_512
    };
 
-   QCryptographicHash(Algorithm method);
+   explicit QCryptographicHash(Algorithm method);
    ~QCryptographicHash();
 
    void reset();
@@ -56,7 +66,5 @@ class Q_CORE_EXPORT QCryptographicHash
    Q_DISABLE_COPY(QCryptographicHash)
    QCryptographicHashPrivate *d;
 };
-
-QT_END_NAMESPACE
 
 #endif

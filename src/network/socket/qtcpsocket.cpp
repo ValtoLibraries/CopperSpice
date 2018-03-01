@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -27,7 +27,6 @@
 #include <qtcpsocket.h>
 #include <qhostaddress.h>
 
-QT_BEGIN_NAMESPACE
 
 QTcpSocket::QTcpSocket(QObject *parent)
    : QAbstractSocket(TcpSocket, *new QTcpSocketPrivate, parent)
@@ -54,4 +53,8 @@ QTcpSocket::QTcpSocket(QTcpSocketPrivate &dd, QObject *parent)
    d_func()->isBuffered = true;
 }
 
-QT_END_NAMESPACE
+QTcpSocket::QTcpSocket(QAbstractSocket::SocketType socketType, QTcpSocketPrivate &dd, QObject *parent)
+   : QAbstractSocket(socketType, dd, parent)
+{
+}
+

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -245,9 +245,6 @@ class Q_CORE_EXPORT QEvent           // event base class
 
       RequestSoftwareInputPanel = 199,
       CloseSoftwareInputPanel = 200,
-
-      // may not be used
-      UpdateSoftKeys = 201,                   // Internal for compressing soft key updates
 
       WinIdChange = 203,
 

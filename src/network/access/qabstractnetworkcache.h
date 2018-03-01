@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -50,7 +50,14 @@ class Q_NETWORK_EXPORT QNetworkCacheMetaData
    QNetworkCacheMetaData(const QNetworkCacheMetaData &other);
    ~QNetworkCacheMetaData();
 
+   QNetworkCacheMetaData &operator=(QNetworkCacheMetaData &&other)  {
+      swap(other);
+      return *this;
+   }
+
    QNetworkCacheMetaData &operator=(const QNetworkCacheMetaData &other);
+   void swap(QNetworkCacheMetaData &other)
+    { qSwap(d, other.d); }
    bool operator==(const QNetworkCacheMetaData &other) const;
    inline bool operator!=(const QNetworkCacheMetaData &other) const {
       return !(*this == other);

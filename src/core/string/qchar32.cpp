@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -93,7 +93,8 @@ QString8 QChar32::decomposition() const
    uint32_t value = unicode();
    const unsigned short *d = cs_internal_decomposition(value, &length, &tag, buffer);
 
-   // broom ( test code only )
+   // broom ( fulll implementation pending )
+
    return QString8::fromUtf16(reinterpret_cast<const char16_t *>(d), length);
 }
 
@@ -365,19 +366,19 @@ QChar32::UnicodeVersion QChar32::currentUnicodeVersion()
    return UNICODE_DATA_VERSION_32;
 }
 
+QDataStream &operator>>(QDataStream &in, QChar32 &ch)
+{
+   quint32 tmp;
+   in >> tmp;
 
-// operators
-#if ! defined(QT_NO_DATASTREAM)
-   QDataStream &operator>>(QDataStream &out, QChar32 &str)
-   {
-      // broom - not implemented
-      return out;
-   }
+   ch = static_cast<char32_t>(tmp);
 
-   QDataStream &operator<<(QDataStream &out, const QChar32 &str)
-   {
-      // broom - not implemented
-      return out;
-   }
-#endif
+   return in;
+}
+
+QDataStream &operator<<(QDataStream &out, const QChar32 &ch)
+{
+   out << static_cast<quint32>(ch.unicode());
+   return out;
+}
 

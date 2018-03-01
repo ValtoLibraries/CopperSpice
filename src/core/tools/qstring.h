@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -23,16 +23,24 @@
 #ifndef QSTRING_H
 #define QSTRING_H
 
-#include <QtCore/qchar.h>
-#include <QtCore/qbytearray.h>
-#include <QtCore/qrefcount.h>
-#include <QtCore/qnamespace.h>
+#include <qchar.h>
+#include <qbytearray.h>
+#include <qrefcount.h>
+#include <qnamespace.h>
 
 #include <string>
 #include <stdarg.h>
 
 #ifdef truncate
 #error qstring.h must be included before any header file that defines truncate
+#endif
+
+#ifdef Q_OS_DARWIN
+   using CFStringRef = const struct __CFString *;
+
+#  ifdef __OBJC__
+   @class NSString;
+#  endif
 #endif
 
 QT_BEGIN_NAMESPACE
@@ -640,6 +648,17 @@ class Q_CORE_EXPORT QString
 #ifndef QT_NO_STL_WCHAR
    static inline QString fromStdWString(const std::wstring &s);
    inline std::wstring toStdWString() const;
+#endif
+
+#if defined(Q_OS_DARWIN)
+    static QString fromCFString(CFStringRef string);
+    CFStringRef toCFString() const;
+
+#  if defined(__OBJC__)
+    static QString fromNSString(const NSString *string);
+    NSString *toNSString() const;
+#  endif
+
 #endif
 
    // compatibility

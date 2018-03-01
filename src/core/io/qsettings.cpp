@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -507,8 +507,8 @@ QString QSettingsPrivate::variantToString(const QVariant &v)
       }
 
       default: {
-#ifndef QT_NO_DATASTREAM
          QByteArray a;
+
          {
             QDataStream s(&a, QIODevice::WriteOnly);
             s.setVersion(QDataStream::Qt_4_0);
@@ -518,9 +518,7 @@ QString QSettingsPrivate::variantToString(const QVariant &v)
          result = QLatin1String("@Variant(");
          result += QString::fromLatin1(a.constData(), a.size());
          result += QLatin1Char(')');
-#else
-         Q_ASSERT(!"QSettings: Cannot save custom types without QDataStream support");
-#endif
+
          break;
       }
    }

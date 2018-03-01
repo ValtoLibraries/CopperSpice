@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -997,10 +997,10 @@ void QUnixPrintWidgetPrivate::setCupsProperties()
       engine->setProperty(PPK_CupsStringPageSize, QString::fromLatin1(cupsPageSize));
       engine->setProperty(PPK_CupsOptions, cups->options());
 
-      QRect pageRect = cups->pageRect(cupsPageSize);
+      QRect pageRect = cups->pageRect(cupsPageSize.data());
       engine->setProperty(PPK_CupsPageRect, pageRect);
 
-      QRect paperRect = cups->paperRect(cupsPageSize);
+      QRect paperRect = cups->paperRect(cupsPageSize.data());
       engine->setProperty(PPK_CupsPaperRect, paperRect);
 
       for (int ps = 0; ps < QPrinter::NPaperSize; ++ps) {

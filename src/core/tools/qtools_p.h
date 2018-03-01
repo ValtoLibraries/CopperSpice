@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -25,11 +25,21 @@
 
 #include <qglobal.h>
 
-QT_BEGIN_NAMESPACE
+namespace QtMiscUtils {
+
+constexpr inline char toHexUpper(uint value)
+{
+    return "0123456789ABCDEF"[value & 0xF];
+}
+
+constexpr inline char toHexLower(uint value)
+{
+    return "0123456789abcdef"[value & 0xF];
+}
+
+}
 
 // implemented in qbytearray.cpp
 int Q_CORE_EXPORT qAllocMore(int alloc, int extra);
-
-QT_END_NAMESPACE
 
 #endif

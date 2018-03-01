@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -23,10 +23,9 @@
 #ifndef QHTTPMULTIPART_P_H
 #define QHTTPMULTIPART_P_H
 
-#include <QtCore/qshareddata.h>
+#include <qshareddata.h>
+#include <qhttppart.h>
 #include <qnetworkrequest_p.h>       // for deriving QHttpPartPrivate from QNetworkHeadersPrivate
-
-QT_BEGIN_NAMESPACE
 
 class QHttpMultiPartPrivate;
 
@@ -88,7 +87,7 @@ class QHttpMultiPartIODevice : public QIODevice
    ~QHttpMultiPartIODevice() {
    }
 
-   virtual bool atEnd() const override {
+   bool atEnd() const override {
       return readPointer == size();
    }
 
@@ -135,7 +134,5 @@ class QHttpMultiPartPrivate
    QHttpMultiPartIODevice *device;
 
 };
-
-QT_END_NAMESPACE
 
 #endif // QHTTPMULTIPART_P_H

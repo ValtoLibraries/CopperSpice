@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -20,15 +20,15 @@
 *
 ***********************************************************************/
 
-#include <qurlinfo.h>
+#include "qurlinfo_p.h"
 
-#ifndef QT_NO_URLINFO
+#ifndef QT_NO_FTP
 
 #include <qurl.h>
 #include <qdir.h>
 #include <limits.h>
 
-QT_BEGIN_NAMESPACE
+
 
 class QUrlInfoPrivate
 {
@@ -699,6 +699,5 @@ bool QUrlInfo::isValid() const
    return d != 0;
 }
 
-QT_END_NAMESPACE
 
 #endif // QT_NO_URLINFO

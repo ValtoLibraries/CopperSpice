@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -33,14 +33,14 @@
 
 #elif defined(Q_OS_WIN)
 #   include <qt_windows.h>
-#   include <qwineventnotifier_p.h>
+#   include <qwineventnotifier.h>
 
 #else
 #   include <qabstractsocketengine_p.h>
 #   include <qsocketnotifier.h>
 #endif
 
-QT_BEGIN_NAMESPACE
+
 
 class QLocalServerPrivate
 {
@@ -104,7 +104,7 @@ class QLocalServerPrivate
 
 };
 
-QT_END_NAMESPACE
+
 
 #endif // QT_NO_LOCALSERVER
 

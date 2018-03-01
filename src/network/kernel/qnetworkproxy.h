@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -67,7 +67,6 @@ class Q_NETWORK_EXPORT QNetworkProxyQuery
 #endif
 
    QNetworkProxyQuery(const QNetworkProxyQuery &other);
-
    ~QNetworkProxyQuery();
 
    QNetworkProxyQuery &operator=(const QNetworkProxyQuery &other);
@@ -213,6 +212,7 @@ class Q_NETWORK_EXPORT QNetworkProxyFactory
    static QList<QNetworkProxy> systemProxyForQuery(const QNetworkProxyQuery &query = QNetworkProxyQuery());
 };
 
+Q_NETWORK_EXPORT QDebug operator<<(QDebug debug, const QNetworkProxy &proxy);
 #endif // QT_NO_NETWORKPROXY
 
 #endif // QHOSTINFO_H

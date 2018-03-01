@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -32,6 +32,9 @@
 QT_BEGIN_NAMESPACE
 
 class QHttpResponseHeader;
+#ifdef Q_OS_WIN
+class QNtlmWindowsHandles;
+#endif
 
 class QAuthenticatorPrivate
 {
@@ -47,6 +50,11 @@ class QAuthenticatorPrivate
    Method method;
    QString realm;
    QByteArray challenge;
+
+#ifdef Q_OS_WIN
+    QNtlmWindowsHandles *ntlmWindowsHandles;
+#endif
+
    bool hasFailed; //credentials have been tried but rejected by server.
 
    enum Phase {
@@ -76,11 +84,6 @@ class QAuthenticatorPrivate
 
    QByteArray digestMd5Response(const QByteArray &challenge, const QByteArray &method, const QByteArray &path);
    static QHash<QByteArray, QByteArray> parseDigestAuthenticationChallenge(const QByteArray &challenge);
-
-#ifndef QT_NO_HTTP
-   void parseHttpResponse(const QHttpResponseHeader &, bool isProxy);
-#endif
-
    void parseHttpResponse(const QList<QPair<QByteArray, QByteArray> > &, bool isProxy);
    void updateCredentials();
 };

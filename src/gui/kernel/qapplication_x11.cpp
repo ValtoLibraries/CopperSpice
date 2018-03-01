@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -706,8 +706,10 @@ extern "C" {
       XGetErrorText( dpy, err->error_code, errstr, 256 );
       char buffer[256];
       char request_str[256];
-      qsnprintf(buffer, 256, "%d", err->request_code);
+
+      std::snprintf(buffer, 256, "%d", err->request_code);
       XGetErrorDatabaseText(dpy, "XRequest", buffer, "", request_str, 256);
+
       if (err->request_code < 128) {
          // X error for a normal protocol request
          qWarning( "X Error: %s %d\n"
@@ -737,11 +739,12 @@ extern "C" {
 
          char minor_str[256];
          if (extensionName) {
-            qsnprintf(buffer, 256, "%s.%d", extensionName, err->minor_code);
+            std::snprintf(buffer, 256, "%s.%d", extensionName, err->minor_code);
             XGetErrorDatabaseText(dpy, "XRequest", buffer, "", minor_str, 256);
+
          } else {
             extensionName = "Uknown extension";
-            qsnprintf(minor_str, 256, "Unknown request");
+            std::snprintf(minor_str, 256, "Unknown request");
          }
 
          qWarning( "X Error: %s %d\n"

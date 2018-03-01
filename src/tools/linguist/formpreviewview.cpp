@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -45,11 +45,7 @@
 
 QT_BEGIN_NAMESPACE
 
-#if defined(Q_CC_HPACC) || defined(Q_CC_XLC)
-int qHash(const QUiTranslatableStringValue &tsv)
-#else
 static int qHash(const QUiTranslatableStringValue &tsv)
-#endif
 {
    return qHash(tsv.value()) ^ qHash(tsv.comment());
 }

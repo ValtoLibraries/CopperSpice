@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -192,12 +192,13 @@ class Item
 
    template<typename TCastTarget>
    inline TCastTarget *as() const {
-#if defined(Patternist_DEBUG) && !defined(Q_CC_XLC)
+
+#if defined(Patternist_DEBUG)
       /* At least on aix-xlc-64, the compiler cries when it sees dynamic_cast. */
       Q_ASSERT_X(atomicValue == 0 || dynamic_cast<const TCastTarget *>(atomicValue),
-                 Q_FUNC_INFO,
-                 "The cast is invalid. This class does not inherit the cast target.");
+                 Q_FUNC_INFO, "The cast is invalid. This class does not inherit the cast target.");
 #endif
+
       return const_cast<TCastTarget *>(static_cast<const TCastTarget *>(atomicValue));
    }
 

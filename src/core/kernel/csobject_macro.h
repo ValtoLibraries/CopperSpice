@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -27,7 +27,9 @@
 #include <cs_slot.h>
 #include <qglobal.h>
 
-#define csPrintable(string)       QString(string).toLatin1().constData()
+#define csPrintable(string)         QString(string).toLatin1().constData()
+#define csPrintable8(string)        QString8(string).constData()
+#define csPrintable16(string)       QString16(string).toUtf8().constData()
 
 #define Q_EMIT
 #define Q_ARG(type, data)           CSArgument<type>{data, #type}
@@ -35,6 +37,8 @@
 
 #define CS_TOKENPASTE1(x,y)         x ## y
 #define CS_TOKENPASTE2(x,y)         CS_TOKENPASTE1(x,y)
+
+/**   \cond INTERNAL (notation so DoxyPress will not parse this class  */
 
 template<int N>
 class cs_number : public cs_number<N - 1>
@@ -49,6 +53,8 @@ class cs_number<0>
    public:
       static constexpr int value = 0;
 };
+
+/**   \endcond   */
 
 
 #ifdef QT_NO_TEXTCODEC

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -21,16 +21,16 @@
 ***********************************************************************/
 
 // do not move include, if qcoreapplication.h is included directly forward declarations are not sufficient 12/30/2013
-#include <QtCore/qobject.h>
+#include <qobject.h>
 
 #ifndef QCOREAPPLICATION_H
 #define QCOREAPPLICATION_H
 
-#include <QtCore/qcoreevent.h>
-#include <QtCore/qeventloop.h>
+#include <qcoreevent.h>
+#include <qeventloop.h>
 #include <QScopedPointer>
 
-#if defined(Q_OS_WIN) && !defined(tagMSG)
+#if defined(Q_OS_WIN) && ! defined(tagMSG)
 typedef struct tagMSG MSG;
 #endif
 
@@ -139,7 +139,7 @@ class Q_CORE_EXPORT QCoreApplication : public QObject
 
    enum Encoding { CodecForTr, UnicodeUTF8, DefaultCodec = CodecForTr };
 
-   static QString translate(const char *context, const char *key, const char *disambiguation = nullptr, 
+   static QString translate(const char *context, const char *key, const char *disambiguation = nullptr,
                   Encoding encoding = CodecForTr, int n = -1);
 
    static void flush();
@@ -308,10 +308,11 @@ public: \
                                              QCoreApplication::UnicodeUTF8, n); } \
 private:
 
-// * *
+//
+using QtStartUpFunction = void (*)();
 using QtCleanUpFunction = void (*)();
 
-
+Q_CORE_EXPORT void qAddPreRoutine(QtStartUpFunction);
 Q_CORE_EXPORT void qAddPostRoutine(QtCleanUpFunction);
 Q_CORE_EXPORT void qRemovePostRoutine(QtCleanUpFunction);
 Q_CORE_EXPORT QString qAppName();

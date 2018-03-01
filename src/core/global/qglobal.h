@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -172,7 +172,7 @@ class QString;
 #  define MAC_OS_X_VERSION_MIN_REQUIRED   MAC_OS_X_VERSION_10_8
 #  include <AvailabilityMacros.h>
 
-#  if !defined(MAC_OS_X_VERSION_10_9)
+#  if ! defined(MAC_OS_X_VERSION_10_9)
 #     define MAC_OS_X_VERSION_10_9    MAC_OS_X_VERSION_10_8 + 10
 #  endif
 
@@ -186,6 +186,10 @@ class QString;
 
 #  if ! defined(MAC_OS_X_VERSION_10_12)
 #     define MAC_OS_X_VERSION_10_12 101200
+#  endif
+
+#  if ! defined(MAC_OS_X_VERSION_10_13)
+#     define MAC_OS_X_VERSION_10_13 101300
 #  endif
 
 #endif
@@ -678,11 +682,11 @@ inline T *q_check_ptr(T *p)
    return p;
 }
 
-#if (defined(Q_CC_GNU) && !defined(Q_OS_SOLARIS)) || defined(Q_CC_HPACC)
+#if (defined(Q_CC_GNU) && ! defined(Q_OS_SOLARIS))
 #  define Q_FUNC_INFO            __PRETTY_FUNCTION__
 
 #else
-#   if defined(Q_OS_SOLARIS) || defined(Q_CC_XLC)
+#   if defined(Q_OS_SOLARIS)
 #      define Q_FUNC_INFO        __FILE__ "(line number unavailable)"
 
 #   else
@@ -961,90 +965,111 @@ inline QIncompatibleFlag::QIncompatibleFlag(int ai) : i(ai) {}
 template<typename Enum>
 class QFlags
 {
-   typedef void **Zero;
-   int i;
+   public:
+      using enum_type = Enum;
 
- public:
-   typedef Enum enum_type;
+      constexpr inline QFlags(const QFlags &other)
+         : i(other.i)
+      {}
 
-   constexpr inline QFlags(const QFlags &f) : i(f.i) {}
-   constexpr inline QFlags(Enum f) : i(f) {}
-   constexpr inline QFlags(Zero = 0) : i(0) {}
+      constexpr inline QFlags(Enum value)
+         : i(static_cast<int>(value))
+      {}
 
-   inline QFlags(QFlag f) : i(f) {}
+      constexpr inline QFlags()
+         : i(0)
+      {}
 
-   inline QFlags &operator=(const QFlags &f) {
-      i = f.i;
-      return *this;
-   }
-   inline QFlags &operator&=(int mask)  {
-      i &= mask;
-      return *this;
-   }
-   inline QFlags &operator&=(uint mask) {
-      i &= mask;
-      return *this;
-   }
-   inline QFlags &operator|=(QFlags f)  {
-      i |= f.i;
-      return *this;
-   }
-   inline QFlags &operator|=(Enum f)    {
-      i |= f;
-      return *this;
-   }
-   inline QFlags &operator^=(QFlags f)  {
-      i ^= f.i;
-      return *this;
-   }
-   inline QFlags &operator^=(Enum f)    {
-      i ^= f;
-      return *this;
-   }
+      constexpr inline QFlags(std::nullptr_t)
+         : i(0)
+      {}
 
-   constexpr  inline operator int() const {
-      return i;
-   }
+      inline QFlags(QFlag flag)
+         : i(flag)
+      {}
 
-   constexpr inline QFlags operator|(QFlags f) const {
-      return QFlags(Enum(i | f.i));
-   }
+      inline QFlags &operator=(const QFlags &other) {
+         i = other.i;
+         return *this;
+      }
 
-   constexpr inline QFlags operator|(Enum f) const {
-      return QFlags(Enum(i | f));
-   }
+      inline QFlags &operator&=(int mask)  {
+         i &= mask;
+         return *this;
+      }
 
-   constexpr inline QFlags operator^(QFlags f) const {
-      return QFlags(Enum(i ^ f.i));
-   }
+      inline QFlags &operator&=(uint mask) {
+         i &= mask;
+         return *this;
+      }
 
-   constexpr inline QFlags operator^(Enum f) const {
-      return QFlags(Enum(i ^ f));
-   }
+      inline QFlags &operator|=(QFlags other)  {
+         i |= other.i;
+         return *this;
+      }
 
-   constexpr inline QFlags operator&(int mask) const {
-      return QFlags(Enum(i & mask));
-   }
+      inline QFlags &operator|=(Enum value)    {
+         i |= static_cast<int>(value);
+         return *this;
+      }
 
-   constexpr inline QFlags operator&(uint mask) const {
-      return QFlags(Enum(i & mask));
-   }
+      inline QFlags &operator^=(QFlags other)  {
+         i ^= other.i;
+         return *this;
+      }
 
-   constexpr inline QFlags operator&(Enum f) const {
-      return QFlags(Enum(i & f));
-   }
+      inline QFlags &operator^=(Enum value)    {
+         i ^= static_cast<int>(value);
+         return *this;
+      }
 
-   constexpr inline QFlags operator~() const {
-      return QFlags(Enum(~i));
-   }
+      constexpr  inline operator int() const {
+         return i;
+      }
 
-   constexpr inline bool operator!() const {
-      return !i;
-   }
+      constexpr inline QFlags operator|(QFlags other) const {
+         return QFlags(Enum(i | other.i));
+      }
 
-   inline bool testFlag(Enum f) const {
-      return (i & f) == f && (f != 0 || i == int(f) );
-   }
+      constexpr inline QFlags operator|(Enum value) const {
+         return QFlags(Enum(i | static_cast<int>(value)));
+      }
+
+      constexpr inline QFlags operator^(QFlags other) const {
+         return QFlags(Enum(i ^ other.i));
+      }
+
+      constexpr inline QFlags operator^(Enum value) const {
+         return QFlags(Enum(i ^ static_cast<int>(value)));
+      }
+
+      constexpr inline QFlags operator&(int mask) const {
+         return QFlags(Enum(i & mask));
+      }
+
+      constexpr inline QFlags operator&(uint mask) const {
+         return QFlags(Enum(i & mask));
+      }
+
+      constexpr inline QFlags operator&(Enum value) const {
+         return QFlags(Enum(i & static_cast<int>(value)));
+      }
+
+      constexpr inline QFlags operator~() const {
+         return QFlags(Enum(~i));
+      }
+
+      constexpr inline bool operator!() const {
+         return !i;
+      }
+
+      inline bool testFlag(Enum value) const {
+         int tmp = static_cast<int>(value);
+         return (i & tmp) == tmp && (tmp != 0 || i == tmp);
+      }
+
+   private:
+      int i;
 };
 
 
@@ -1086,7 +1111,7 @@ for (variable : container)
 #  endif
 #endif
 
-// raw pointer ( QEasingCurvePrivate, QStringMatcherPrivate, maybe a few other classes 12/28/2013 )
+// raw pointer ( QEasingCurvePrivate, maybe a few other classes 12/28/2013 )
 template <typename T>
 T *qGetPtrHelper(T *ptr)
 {

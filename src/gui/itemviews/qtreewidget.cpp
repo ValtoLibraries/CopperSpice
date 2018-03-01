@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -1867,19 +1867,14 @@ bool QTreeWidgetItem::operator<(const QTreeWidgetItem &other) const
    return QAbstractItemModelPrivate::variantLessThan(v1, v2);
 }
 
-#ifndef QT_NO_DATASTREAM
-
-/*!
-    Reads the item from stream \a in. This only reads data into a single item.
-
-    \sa write()
-*/
 void QTreeWidgetItem::read(QDataStream &in)
 {
    // convert from streams written before we introduced display (4.2.0)
+
    if (in.version() < QDataStream::Qt_4_2) {
       d->display.clear();
       in >> values;
+
       // move the display value over to the display string list
       for (int column = 0; column < values.count(); ++column) {
          d->display << QVariant();
@@ -1890,32 +1885,17 @@ void QTreeWidgetItem::read(QDataStream &in)
             }
          }
       }
+
    } else {
       in >> values >> d->display;
    }
 }
 
-/*!
-    Writes the item to stream \a out. This only writes data from one single item.
-
-    \sa read()
-*/
 void QTreeWidgetItem::write(QDataStream &out) const
 {
    out << values << d->display;
 }
-#endif // QT_NO_DATASTREAM
 
-/*!
-    \since 4.1
-
-    Constructs a copy of \a other. Note that type() and treeWidget()
-    are not copied.
-
-    This function is useful when reimplementing clone().
-
-    \sa data(), flags()
-*/
 QTreeWidgetItem::QTreeWidgetItem(const QTreeWidgetItem &other)
    : rtti(Type), values(other.values), view(0),
      d(new QTreeWidgetItemPrivate(this)), par(0),

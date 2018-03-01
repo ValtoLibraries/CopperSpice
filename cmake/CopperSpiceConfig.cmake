@@ -1,6 +1,6 @@
 #
-# Copyright (C) 2012-2017 Barbara Geller
-# Copyright (C) 2012-2017 Ansel Sermersheim
+# Copyright (C) 2012-2018 Barbara Geller
+# Copyright (C) 2012-2018 Ansel Sermersheim
 # All rights reserved.
 #
 #  Config file for the CopperSpice package, defines the following variables:
@@ -57,10 +57,10 @@ foreach(component ${COPPERSPICE_COMPONENTS})
 
     set(COPPERSPICE_LIBRARIES
         ${COPPERSPICE_LIBRARIES}
-        CopperSpice::Cs${component}@BUILD_MAJOR@
+        CopperSpice::Cs${component}@BUILD_ABI@
     )
     set(COPPERSPICE_${uppercomp}_LIBRARIES
-        CopperSpice::Cs${component}@BUILD_MAJOR@
+        CopperSpice::Cs${component}@BUILD_ABI@
     )
 endforeach()
 

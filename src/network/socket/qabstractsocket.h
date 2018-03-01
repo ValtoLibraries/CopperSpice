@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -23,11 +23,11 @@
 #ifndef QABSTRACTSOCKET_H
 #define QABSTRACTSOCKET_H
 
-#include <QtCore/qiodevice.h>
-#include <QtCore/qobject.h>
-#include <QtCore/qdebug.h>
+#include <qiodevice.h>
+#include <qobject.h>
+#include <qdebug.h>
 
-QT_BEGIN_NAMESPACE
+
 
 class QAbstractSocketPrivate;
 class QAuthenticator;
@@ -37,6 +37,9 @@ class QHostInfo;
 #ifndef QT_NO_NETWORKPROXY
 class QNetworkProxy;
 #endif
+
+class QAbstractSocketPrivate;
+class QAuthenticator;
 
 class Q_NETWORK_EXPORT QAbstractSocket : public QIODevice
 {
@@ -201,8 +204,7 @@ class Q_NETWORK_EXPORT QAbstractSocket : public QIODevice
    NET_CS_SIGNAL_OVERLOAD(error, (QAbstractSocket::SocketError), un_named_arg1)
 
 #ifndef QT_NO_NETWORKPROXY
-   NET_CS_SIGNAL_1(Public, void proxyAuthenticationRequired(const QNetworkProxy &proxy,
-                  QAuthenticator *authenticator))
+   NET_CS_SIGNAL_1(Public, void proxyAuthenticationRequired(const QNetworkProxy &proxy, QAuthenticator *authenticator))
    NET_CS_SIGNAL_2(proxyAuthenticationRequired, proxy, authenticator)
 #endif
 

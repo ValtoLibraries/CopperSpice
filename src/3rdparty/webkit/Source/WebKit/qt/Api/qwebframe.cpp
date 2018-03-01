@@ -1814,8 +1814,10 @@ QString QWebHitTestResult::linkText() const
 */
 QUrl QWebHitTestResult::linkUrl() const
 {
-    if (!d)
+    if (! d) {
         return QUrl();
+    }
+
     return d->linkUrl;
 }
 
@@ -1824,9 +1826,11 @@ QUrl QWebHitTestResult::linkUrl() const
 */
 QUrl QWebHitTestResult::linkTitle() const
 {
-    if (!d)
-        return QUrl();
-    return d->linkTitle;
+    if (! d) {
+       return QUrl();
+    }
+
+    return QUrl(d->linkTitle);
 }
 
 /*
@@ -1837,8 +1841,10 @@ QUrl QWebHitTestResult::linkTitle() const
 */
 QWebElement QWebHitTestResult::linkElement() const
 {
-    if (!d)
+    if (! d) {
         return QWebElement();
+    }
+
     return d->linkElement;
 }
 

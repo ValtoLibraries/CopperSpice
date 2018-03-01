@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -5069,11 +5069,13 @@ void QDomElement::setAttribute(const QString &name, qint64 value)
 
 void QDomElement::setAttribute(const QString &name, quint64 value)
 {
-   if (!impl) {
+   if (! impl) {
       return;
    }
+
    QString x;
    x.setNum(value);
+
    IMPL->setAttribute(name, x);
 }
 
@@ -5082,52 +5084,34 @@ void QDomElement::setAttribute(const QString &name, float value)
    if (!impl) {
       return;
    }
+
    QString x;
    x.setNum(value);
+
    IMPL->setAttribute(name, x);
 }
 
-/*!
-    \overload
-
-    The number is formatted according to the current locale.
-*/
 void QDomElement::setAttribute(const QString &name, double value)
 {
-   if (!impl) {
+   if (! impl) {
       return;
    }
+
    QString x;
-   char buf[256];
-   int count = qsnprintf(buf, sizeof(buf), "%.16g", value);
-   if (count > 0) {
-      x = QString::fromLatin1(buf, count);
-   } else {
-      x.setNum(value);   // Fallback
-   }
+   x.setNum(value, 'g', 16);
+
    IMPL->setAttribute(name, x);
 }
 
-/*!
-    Removes the attribute called name \a name from this element.
-
-    \sa setAttribute() attribute() removeAttributeNS()
-*/
 void QDomElement::removeAttribute(const QString &name)
 {
    if (!impl) {
       return;
    }
+
    IMPL->removeAttribute(name);
 }
 
-/*!
-    Returns the QDomAttr object that corresponds to the attribute
-    called \a name. If no such attribute exists a \link
-    QDomNode::isNull() null attribute\endlink is returned.
-
-    \sa setAttributeNode() attribute() setAttribute() attributeNodeNS()
-*/
 QDomAttr QDomElement::attributeNode(const QString &name)
 {
    if (!impl) {

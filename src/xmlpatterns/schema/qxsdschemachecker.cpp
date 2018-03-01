@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -2130,11 +2130,12 @@ QSourceLocation XsdSchemaChecker::sourceLocation(const NamedSchemaComponent::Ptr
 {
    if (m_componentLocationHash.contains(component)) {
       return m_componentLocationHash.value(component);
+
    } else {
       QSourceLocation location;
       location.setLine(1);
       location.setColumn(1);
-      location.setUri(QString::fromLatin1("dummyUri"));
+      location.setUri( QUrl("dummyUri") );
 
       return location;
    }

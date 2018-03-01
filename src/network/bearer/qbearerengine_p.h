@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -64,10 +64,13 @@ class Q_NETWORK_EXPORT QBearerEngine : public QObject
 
    NET_CS_SIGNAL_1(Public, void configurationAdded(QNetworkConfigurationPrivatePointer config))
    NET_CS_SIGNAL_2(configurationAdded, config)
+
    NET_CS_SIGNAL_1(Public, void configurationRemoved(QNetworkConfigurationPrivatePointer config))
    NET_CS_SIGNAL_2(configurationRemoved, config)
+
    NET_CS_SIGNAL_1(Public, void configurationChanged(QNetworkConfigurationPrivatePointer config))
    NET_CS_SIGNAL_2(configurationChanged, config)
+
    NET_CS_SIGNAL_1(Public, void updateCompleted())
    NET_CS_SIGNAL_2(updateCompleted)
 

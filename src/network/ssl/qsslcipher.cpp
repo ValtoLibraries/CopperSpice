@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -34,7 +34,7 @@ QSslCipher::QSslCipher()
 QSslCipher::QSslCipher(const QString &name)
    : d(new QSslCipherPrivate)
 {
-   foreach (const QSslCipher &cipher, QSslConfiguration::supportedCiphers()) {
+   for (const QSslCipher &cipher : QSslConfiguration::supportedCiphers()) {
       if (cipher.name() == name) {
          *this = cipher;
          return;
@@ -45,7 +45,7 @@ QSslCipher::QSslCipher(const QString &name)
 QSslCipher::QSslCipher(const QString &name, QSsl::SslProtocol protocol)
    : d(new QSslCipherPrivate)
 {
-   for (const QSslCipher & cipher : QSslConfiguration::supportedCiphers()) {
+   for (const QSslCipher &cipher : QSslConfiguration::supportedCiphers()) {
       if (cipher.name() == name && cipher.protocol() == protocol) {
          *this = cipher;
          return;
@@ -121,9 +121,12 @@ QSsl::SslProtocol QSslCipher::protocol() const
 
 QDebug operator<<(QDebug debug, const QSslCipher &cipher)
 {
-   debug << "QSslCipher(name=" << qPrintable(cipher.name())
-         << ", bits=" << cipher.usedBits()
-         << ", proto=" << qPrintable(cipher.protocolString())
+   // QDebugStateSaver saver(debug);
+   // debug.resetFormat().nospace().noquote();
+
+   debug << "QSslCipher(name=" << cipher.name()
+         << ", bits="  << cipher.usedBits()
+         << ", proto=" << cipher.protocolString()
          << ')';
    return debug;
 }

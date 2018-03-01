@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -51,10 +51,6 @@
 
 #ifdef Q_WS_X11
 #include <qmenubar_x11_p.h>
-#endif
-
-#ifdef QT_SOFTKEYS_ENABLED
-#include <qsoftkeymanager_p.h>
 #endif
 
 QT_BEGIN_NAMESPACE
@@ -764,10 +760,6 @@ void QMenuBarPrivate::init()
    q->setBackgroundRole(QPalette::Button);
    oldWindow = oldParent = 0;
 
-#ifdef QT_SOFTKEYS_ENABLED
-   menuBarAction = 0;
-#endif
-
 #ifdef Q_WS_X11
    cornerWidgetToolBar = 0;
    cornerWidgetContainer = 0;
@@ -1454,12 +1446,6 @@ void QMenuBar::changeEvent(QEvent *e)
               || e->type() == QEvent::ApplicationFontChange) {
       d->itemsDirty = true;
       d->updateGeometries();
-#ifdef QT_SOFTKEYS_ENABLED
-   } else if (e->type() == QEvent::LanguageChange) {
-      if (d->menuBarAction) {
-         d->menuBarAction->setText(QSoftKeyManager::standardSoftKeyText(QSoftKeyManager::MenuSoftKey));
-      }
-#endif
    }
 
    QWidget::changeEvent(e);

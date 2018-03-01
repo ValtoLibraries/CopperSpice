@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -233,9 +233,6 @@ class Q_CORE_EXPORT Qt
       BypassGraphicsProxyWidget = 0x20000000,
       WindowOkButtonHint = 0x00080000,
       WindowCancelButtonHint = 0x00100000,
-      WindowSoftkeysVisibleHint = 0x40000000,
-      WindowSoftkeysRespondHint = 0x80000000
-
    };
 
    using WindowFlags = QFlags<WindowType>;
@@ -377,9 +374,6 @@ class Q_CORE_EXPORT Qt
       WA_AcceptTouchEvents = 121,
       WA_WState_AcceptedTouchBeginEvent = 122,
       WA_TouchPadAcceptSingleTouchEvents = 123,
-
-      WA_MergeSoftkeys =  124,
-      WA_MergeSoftkeysRecursively =  125,
 
       WA_LockPortraitOrientation = 128,
       WA_LockLandscapeOrientation = 129,

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -25,17 +25,28 @@
 
 #define CS_STRING_ALLOW_UNSAFE
 
+#include <cstddef>
+#include <string>
+
 #include <qglobal.h>
-#include <cs_string.h>
-#include <qchar32.h>
 #include <qbytearray.h>
 
-class QRegExp;
+#include <cs_string.h>
+#include <qchar32.h>
+#include <qstringview.h>
+
+class QStringParser;
+
+template <typename S>
+class QRegularExpression;
 
 class Q_CORE_EXPORT QString16 : public CsString::CsString_utf16
 {
    public:
 
 };
+
+Q_CORE_EXPORT QDataStream &operator<<(QDataStream &, const QString16 &);
+Q_CORE_EXPORT QDataStream &operator>>(QDataStream &, QString16 &);
 
 #endif

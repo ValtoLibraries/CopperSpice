@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -143,7 +143,7 @@ static bool releaseTsFile(const QString &tsFileName,
    }
 
    QString qmFileName = tsFileName;
-   foreach (const Translator::FileFormat & fmt, Translator::registeredFileFormats()) {
+   for (const Translator::FileFormat & fmt: Translator::registeredFileFormats()) {
       if (qmFileName.endsWith(QLatin1Char('.') + fmt.extension)) {
          qmFileName.chop(fmt.extension.length() + 1);
          break;
@@ -239,7 +239,7 @@ int main(int argc, char **argv)
       return 1;
    }
 
-   foreach (const QString & inputFile, inputFiles) {
+   for (const QString & inputFile : inputFiles) {
 
       if (outputFile.isEmpty()) {
          if (!releaseTsFile(inputFile, cd, removeIdentical)) {

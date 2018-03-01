@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -26,7 +26,7 @@
 #include <QtNetwork/qabstractsocket.h>
 #include <QtCore/qvariant.h>
 
-QT_BEGIN_NAMESPACE
+
 
 class QTcpSocketPrivate;
 
@@ -40,12 +40,13 @@ class Q_NETWORK_EXPORT QTcpSocket : public QAbstractSocket
 
  protected:
    QTcpSocket(QTcpSocketPrivate &dd, QObject *parent = nullptr);
+   QTcpSocket(QAbstractSocket::SocketType socketType, QTcpSocketPrivate &dd, QObject *parent = nullptr);
 
  private:
    Q_DISABLE_COPY(QTcpSocket)
    Q_DECLARE_PRIVATE(QTcpSocket)
 };
 
-QT_END_NAMESPACE
+
 
 #endif // QTCPSOCKET_H

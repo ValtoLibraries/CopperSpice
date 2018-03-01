@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -31,10 +31,12 @@
 #include <list>
 #include <string>
 #include <stdexcept>
+
 #include <limits.h>
 #include <string.h>
 
 #include <qassert.h>
+#include <qglobal.h>
 
 template <typename T>
 class QSet;
@@ -96,7 +98,15 @@ class QList
    }
 
    void append(const QList<T> &other) {
-      m_data.insert(m_data.end(), other.m_data.begin(), other.m_data.end());
+      if (this != &other) {
+        m_data.insert(m_data.end(), other.m_data.begin(), other.m_data.end());
+        return;
+      }
+
+      auto numElements = this->size();
+      for (QList<T>::size_type i = 0; i < numElements; ++i) {
+          m_data.push_back(m_data[i]);
+      }
    }
 
    const T &at(size_type i) const;
@@ -189,7 +199,7 @@ class QList
      return size();
    }
 
-   difference_type lastIndexOf(const T &value, size_type from = -1) const {
+   size_type lastIndexOf(const T &value, size_type from = -1) const {
       size_type retval = -1;
       size_type from_reverse = 0;
 
@@ -382,7 +392,7 @@ class QList
    }
 
    QList<T> &operator+=(const QList<T> &other) {
-      m_data.insert(m_data.end(), other.m_data.begin(), other.m_data.end());
+      append(other);
       return *this;
    }
 
@@ -608,6 +618,16 @@ inline T &QList<T>::operator[](size_type i)
    return m_data[i];
 }
 
+template <typename T>
+uint qHash(const QList<T> &list, uint seed = 0)
+{
+   for (const auto &item : list)  {
+      seed = qHash(item, seed);
+   }
+
+   return seed;
+}
+
 template <class T>
 class QListIterator
 {
@@ -718,4 +738,4 @@ class QMutableListIterator
       }
 };
 
-#endif // QLIST_H
+#endif

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -74,7 +74,6 @@
 #include <qstyle_p.h>
 #include <qinputcontext_p.h>
 #include <qfileinfo.h>
-#include <qsoftkeymanager_p.h>
 
 #if defined (Q_OS_WIN)
 # include <qwininputcontext_p.h>
@@ -6092,10 +6091,6 @@ bool QWidget::event(QEvent *event)
          break;
 
       case QEvent::FocusIn:
-
-#ifdef QT_SOFTKEYS_ENABLED
-         QSoftKeyManager::updateSoftKeys();
-#endif
          focusInEvent((QFocusEvent *)event);
          break;
 
@@ -6254,12 +6249,6 @@ bool QWidget::event(QEvent *event)
             }
          }
 
-#ifdef QT_SOFTKEYS_ENABLED
-         if (isWindow()) {
-            QSoftKeyManager::updateSoftKeys();
-         }
-#endif
-
          break;
       }
 
@@ -6390,10 +6379,6 @@ bool QWidget::event(QEvent *event)
       case QEvent::ActionAdded:
       case QEvent::ActionRemoved:
       case QEvent::ActionChanged:
-
-#ifdef QT_SOFTKEYS_ENABLED
-         QSoftKeyManager::updateSoftKeys();
-#endif
          actionEvent((QActionEvent *)event);
          break;
 #endif

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -31,6 +31,9 @@
 
 #if defined(OCSP_RESPONSE)
 #undef OCSP_RESPONSE
+#endif
+#if defined(X509_NAME)
+#undef X509_NAME
 #endif
 #endif
 
@@ -85,6 +88,7 @@ public:
    void startServerEncryption() override;
    void transmit() override;
    bool startHandshake();
+
    void disconnectFromHost() override;
    void disconnected() override;
 
@@ -98,7 +102,7 @@ public:
 
 #ifdef Q_OS_WIN
     void fetchCaRootForCert(const QSslCertificate &cert);
-    void _q_caRootLoaded(QSslCertificate,QSslCertificate);
+    void _q_caRootLoaded(QSslCertificate,QSslCertificate) override;
 #endif
 
    static long setupOpenSslOptions(QSsl::SslProtocol protocol, QSsl::SslOptions sslOptions);

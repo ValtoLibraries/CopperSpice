@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -26,10 +26,8 @@
 #include <qnetworkaccessmanager.h>
 #include <qnetworkaccesscache_p.h>
 #include <qnetworkaccessbackend_p.h>
-#include <QtNetwork/qnetworkproxy.h>
-#include <QtCore/QMutex>
-
-QT_BEGIN_NAMESPACE
+#include <qnetworkproxy.h>
+#include <QMutex>
 
 class QAuthenticator;
 class QAbstractNetworkCache;
@@ -42,7 +40,7 @@ class QNetworkAuthenticationCredential
    QString domain;
    QString user;
    QString password;
-   bool isNull() {
+   bool isNull() const {
       return domain.isNull() && user.isNull() && password.isNull();
    }
 };
@@ -50,6 +48,15 @@ Q_DECLARE_TYPEINFO(QNetworkAuthenticationCredential, Q_MOVABLE_TYPE);
 inline bool operator<(const QNetworkAuthenticationCredential &t1, const QString &t2)
 {
    return t1.domain < t2;
+}
+inline bool operator<(const QString &t1, const QNetworkAuthenticationCredential &t2)
+{
+   return t1 < t2.domain;
+}
+
+inline bool operator<(const QNetworkAuthenticationCredential &t1, const QNetworkAuthenticationCredential &t2)
+{
+   return t1.domain < t2.domain;
 }
 
 class QNetworkAccessAuthenticationManager
@@ -73,7 +80,5 @@ class QNetworkAccessAuthenticationManager
    QNetworkAccessCache authenticationCache;
    QMutex mutex;
 };
-
-QT_END_NAMESPACE
 
 #endif

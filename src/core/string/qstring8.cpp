@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -20,9 +20,11 @@
 *
 ***********************************************************************/
 
+#include <array>
+
 #include <qstring8.h>
 #include <qdatastream.h>
-#include <qregexp.h>
+#include <qregularexpression.h>
 #include <qunicodetables_p.h>
 
 static bool cs_internal_quickCheck(QString8::const_iterator &first_iter, QString8::const_iterator last_iter,
@@ -59,9 +61,40 @@ QString8::QString8(QChar32 c)
 {
 }
 
-QString8::QString8(size_type size, QChar32 c)
-   : CsString::CsString(size, c)
+QString8::QString8(size_type numOfChars, QChar32 c)
+   : CsString::CsString(numOfChars, c)
 {
+}
+
+QString8::const_iterator QString8::cs_internal_find_fast(QChar32 c, const_iterator iter_begin) const
+{
+   const_iterator iter_end = cend();
+
+   if (iter_begin == iter_end) {
+      return iter_end;
+   }
+
+   auto iter = iter_begin;
+   QString8 strFolded = c.toCaseFolded();
+
+   if (strFolded.size() == 1) {
+      char32_t value = strFolded.first().unicode();
+
+      while (iter != iter_end)   {
+         if (iter->toCaseFolded().first().unicode() == value)  {
+            // found a match
+            return iter;
+         }
+
+         ++iter;
+      }
+
+   } else {
+      return cs_internal_find_fast(strFolded, iter_begin);
+
+   }
+
+   return iter_end;
 }
 
 QString8::const_iterator QString8::cs_internal_find_fast(const QString8 &str, const_iterator iter_begin) const
@@ -80,7 +113,7 @@ QString8::const_iterator QString8::cs_internal_find_fast(const QString8 &str, co
    QString8 strFolded = str.toCaseFolded();
 
    while (iter != iter_end)   {
-      // review: account for code points with expand with folded
+      // review: account for code points which expand when folded
 
       if (iter->toCaseFolded() == QString8(strFolded[0]))  {
          auto text_iter    = iter + 1;
@@ -110,6 +143,85 @@ QString8::const_iterator QString8::cs_internal_find_fast(const QString8 &str, co
    return iter_end;
 }
 
+QString8::const_iterator QString8::cs_internal_rfind_fast(QChar32 c, const_iterator iter_begin) const
+{
+   const_iterator iter_end = cend();
+
+   if (iter_begin == iter_end) {
+      return iter_end;
+   }
+
+   auto iter = iter_begin;
+   QString8 strFolded = c.toCaseFolded();
+
+   if (strFolded.size() == 1) {
+      char32_t value = strFolded.first().unicode();
+
+      while (iter != iter_end)   {
+         if (iter->toCaseFolded().first().unicode() == value)  {
+            // found a match
+            return iter;
+         }
+
+         ++iter;
+      }
+
+   } else {
+      return cs_internal_rfind_fast(strFolded, iter_begin);
+
+   }
+
+   return iter_end;
+}
+
+QString8::const_iterator QString8::cs_internal_rfind_fast(const QString8 &str, const_iterator iter_begin) const
+{
+   const_iterator iter_end = cend();
+
+   if (iter_begin == iter_end) {
+      return iter_end;
+   }
+
+   if (str.empty()) {
+      return iter_begin;
+   }
+
+   auto iter = iter_begin;
+   QString8 strFolded = str.toCaseFolded();
+
+   while (iter != iter_end)   {
+      // review: account for code points which expand when folded
+
+      if (iter->toCaseFolded() == QString8(strFolded[0]))  {
+         auto text_iter    = iter + 1;
+         auto pattern_iter = strFolded.begin() + 1;
+
+         while (text_iter != iter_end && pattern_iter != str.cend())  {
+
+            if (text_iter->toCaseFolded() == QString8(*pattern_iter))  {
+               ++text_iter;
+               ++pattern_iter;
+
+            } else {
+               break;
+
+            }
+         }
+
+         if (pattern_iter == strFolded.end()) {
+            // found a match
+            return iter;
+         }
+      }
+
+      ++iter;
+   }
+
+   return iter_end;
+}
+
+
+
 // methods
 void QString8::chop(size_type n)
 {
@@ -117,6 +229,100 @@ void QString8::chop(size_type n)
       auto iter = end() - n;
       erase(iter, end());
    }
+}
+
+int QString8::compare(const QString8 &str, Qt::CaseSensitivity cs) const
+{
+   auto iter_a = cbegin();
+   auto iter_b = str.cbegin();
+
+   while (iter_a != cend() && iter_b != str.cend()) {
+
+      auto value_a = *iter_a;
+      auto value_b = *iter_b;
+
+      if (cs == Qt::CaseSensitive) {
+         if (value_a < value_b) {
+            return -1;
+
+         } else if (value_a > value_b) {
+            return 1;
+
+         }
+
+      } else {
+         auto folded_a = value_a.toCaseFolded();
+         auto folded_b = value_b.toCaseFolded();
+
+         if (folded_a < folded_b) {
+            return -1;
+
+         } else if (folded_a > folded_b) {
+            return 1;
+
+         }
+      }
+
+      ++iter_a;
+      ++iter_b;
+   }
+
+   if (iter_b != str.cend())  {
+      return -1;
+
+   } else if (iter_a != cend()) {
+      return 1;
+
+   }
+
+   return 0;
+}
+
+int QString8::compare(QStringView8 str, Qt::CaseSensitivity cs) const
+{
+   auto iter_a = cbegin();
+   auto iter_b = str.cbegin();
+
+   while (iter_a != cend() && iter_b != str.cend()) {
+
+      auto value_a = *iter_a;
+      auto value_b = *iter_b;
+
+      if (cs == Qt::CaseSensitive) {
+         if (value_a < value_b) {
+            return -1;
+
+         } else if (value_a > value_b) {
+            return 1;
+
+         }
+
+      } else {
+         auto folded_a = value_a.toCaseFolded();
+         auto folded_b = value_b.toCaseFolded();
+
+         if (folded_a < folded_b) {
+            return -1;
+
+         } else if (folded_a > folded_b) {
+            return 1;
+
+         }
+      }
+
+      ++iter_a;
+      ++iter_b;
+   }
+
+   if (iter_b != str.cend())  {
+      return -1;
+
+   } else if (iter_a != cend()) {
+      return 1;
+
+   }
+
+   return 0;
 }
 
 QString8::size_type QString8::count(QChar32 c, Qt::CaseSensitivity cs) const
@@ -147,30 +353,56 @@ QString8::size_type QString8::count(const QString8 &str, Qt::CaseSensitivity cs)
 {
    size_type retval = 0;
 
-   if (cs == Qt::CaseSensitive) {
-      const_iterator iter      = this->cbegin();
-      const_iterator iter_end  = this->cend();
+   const_iterator iter      = this->cbegin();
+   const_iterator iter_end  = this->cend();
 
-      iter = find_fast(str, iter);
+   iter = indexOfFast(str, iter, cs);
 
-      while (iter != iter_end) {
-         ++retval;
-         iter = find_fast(str, iter+1);
+   while (iter != iter_end) {
+      ++retval;
+      iter = indexOfFast(str, iter+1, cs);
+   }
+
+   return retval;
+}
+
+QString8::size_type QString8::count(QStringView8 str, Qt::CaseSensitivity cs) const
+{
+   size_type retval = 0;
+
+   const_iterator iter      = cbegin();
+   const_iterator iter_end  = cend();
+
+   iter = indexOfFast(str, iter, cs);
+
+   while (iter != iter_end) {
+      ++retval;
+      iter = indexOfFast(str, iter+1, cs);
+   }
+
+   return retval;
+}
+
+QString8::size_type QString8::count(const QRegularExpression<QString8> &regExp) const
+{
+   size_type retval = 0;
+
+   const_iterator iter     = cbegin();
+   const_iterator iter_end = cend();
+
+   QRegularExpressionMatch<QString8> match;
+
+   while (iter != iter_end) {                      // count overlapping matches
+      match = regExp.match(*this, iter);
+
+      if (! match.hasMatch()) {
+         break;
       }
 
-   } else {
-      QString8 self = this->toCaseFolded();
-      QString8 tmp  = str.toCaseFolded();
+      retval++;
 
-      const_iterator iter      = self.cbegin();
-      const_iterator iter_end  = self.cend();
-
-      iter = self.find_fast(tmp, iter);
-
-      while (iter != iter_end) {
-         ++retval;
-         iter = find_fast(tmp, iter+1);
-      }
+      iter = match.capturedStart(0);
+      ++iter;
    }
 
    return retval;
@@ -178,29 +410,14 @@ QString8::size_type QString8::count(const QString8 &str, Qt::CaseSensitivity cs)
 
 bool QString8::contains(QChar32 c, Qt::CaseSensitivity cs) const
 {
-   if (cs == Qt::CaseSensitive) {
-      const_iterator iter      = this->cbegin();
-      const_iterator iter_end  = this->cend();
+   const_iterator iter      = this->cbegin();
+   const_iterator iter_end  = this->cend();
 
-      QString8 other = QString8(c);
-      iter = find_fast(other, iter);
+   QString8 other = QString8(c);
+   iter = indexOfFast(other, iter, cs);
 
-      if (iter != iter_end) {
-         return true;
-      }
-
-   } else {
-      QString8 self = this->toCaseFolded();
-      QString8 tmp  = c.toCaseFolded();
-
-      const_iterator iter     = self.cbegin();
-      const_iterator iter_end = self.cend();
-
-      iter = self.find_fast(tmp, iter);
-
-      if (iter != iter_end) {
-         return true;
-      }
+   if (iter != iter_end) {
+      return true;
    }
 
    return false;
@@ -208,31 +425,64 @@ bool QString8::contains(QChar32 c, Qt::CaseSensitivity cs) const
 
 bool QString8::contains(const QString8 &other, Qt::CaseSensitivity cs) const
 {
-   if (cs == Qt::CaseSensitive) {
-      const_iterator iter      = this->cbegin();
-      const_iterator iter_end  = this->cend();
 
-      iter = find_fast(other, iter);
+   const_iterator iter      = this->cbegin();
+   const_iterator iter_end  = this->cend();
 
-      if (iter != iter_end) {
-         return true;
-      }
+   iter = indexOfFast(other, iter, cs);
 
-   } else {
-      QString8 self = this->toCaseFolded();
-      QString8 tmp  = other.toCaseFolded();
-
-      const_iterator iter     = self.cbegin();
-      const_iterator iter_end = self.cend();
-
-      iter = self.find_fast(tmp, iter);
-
-      if (iter != iter_end) {
-         return true;
-      }
+   if (iter != iter_end) {
+      return true;
    }
 
    return false;
+}
+
+bool QString8::contains(QStringView8 str, Qt::CaseSensitivity cs) const
+{
+
+   const_iterator iter      = this->cbegin();
+   const_iterator iter_end  = this->cend();
+
+   iter = indexOfFast(str, iter, cs);      // PERTH str was other
+
+   if (iter != iter_end) {
+      return true;
+   }
+
+   return false;
+}
+
+template <typename TRAITS, typename T>
+static T convertCase(const T &str)
+{
+   T retval;
+
+   for (auto c : str)  {
+      uint32_t value = c.unicode();
+
+      const QUnicodeTables::Properties *prop = QUnicodeTables::properties(value);
+      int32_t caseDiff = TRAITS::caseDiff(prop);
+
+      if (TRAITS::caseSpecial(prop)) {
+
+         const ushort *specialCase = QUnicodeTables::specialCaseMap + caseDiff;
+
+         ushort length = *specialCase;
+         ++specialCase;
+
+         for (ushort cnt; cnt < length; ++cnt)  {
+            retval += QChar32(specialCase[cnt]);
+         }
+
+
+      } else {
+         retval += QChar32( static_cast<char32_t>(value + caseDiff) );
+
+      }
+   }
+
+   return retval;
 }
 
 bool QString8::endsWith(QChar32 c, Qt::CaseSensitivity cs) const
@@ -252,9 +502,9 @@ bool QString8::endsWith(QChar32 c, Qt::CaseSensitivity cs) const
    }
 }
 
-bool QString8::endsWith(const QString8 &other, Qt::CaseSensitivity cs) const
+bool QString8::endsWith(const QString8 &str, Qt::CaseSensitivity cs) const
 {
-   if (other.empty() ){
+   if (str.empty() ){
       return true;
 
    } else if (empty()) {
@@ -264,7 +514,7 @@ bool QString8::endsWith(const QString8 &other, Qt::CaseSensitivity cs) const
    if (cs == Qt::CaseSensitive) {
       auto iter = crbegin();
 
-      for (auto iter_other = other.crbegin(); iter_other != other.crend(); ++iter_other) {
+      for (auto iter_other = str.crbegin(); iter_other != str.crend(); ++iter_other) {
 
          if (iter == crend()) {
             return false;
@@ -282,7 +532,54 @@ bool QString8::endsWith(const QString8 &other, Qt::CaseSensitivity cs) const
    } else {
       auto iter = crbegin();
 
-      for (auto iter_other = other.crbegin(); iter_other != other.crend(); ++iter_other) {
+      for (auto iter_other = str.crbegin(); iter_other != str.crend(); ++iter_other) {
+
+         if (iter == rend()) {
+            return false;
+         }
+
+         if (iter->toCaseFolded() != iter_other->toCaseFolded()) {
+            return false;
+         }
+
+         ++iter;
+      }
+
+      return true;
+   }
+}
+
+bool QString8::endsWith(QStringView8 str, Qt::CaseSensitivity cs) const
+{
+   if (str.empty() ){
+      return true;
+
+   } else if (empty()) {
+      return false;
+   }
+
+   if (cs == Qt::CaseSensitive) {
+      auto iter = crbegin();
+
+      for (auto iter_other = str.crbegin(); iter_other != str.crend(); ++iter_other) {
+
+         if (iter == crend()) {
+            return false;
+         }
+
+         if (*iter != *iter_other) {
+            return false;
+         }
+
+         ++iter;
+      }
+
+      return true;
+
+   } else {
+      auto iter = crbegin();
+
+      for (auto iter_other = str.crbegin(); iter_other != str.crend(); ++iter_other) {
 
          if (iter == rend()) {
             return false;
@@ -322,14 +619,14 @@ QString8 QString8::fromLatin1(const QByteArray &str)
    return retval;
 }
 
-QString8 QString8::fromLatin1(const char *str, size_type size)
+QString8 QString8::fromLatin1(const char *str, size_type numOfChars)
 {
    QString8 retval;
 
    if (str == nullptr) {
       // do nothing
 
-   } else if (size == -1)  {
+   } else if (numOfChars == -1)  {
 
       for (size_type i = 0; str[i] != 0; ++i) {
          const char32_t value = str[i];
@@ -338,7 +635,7 @@ QString8 QString8::fromLatin1(const char *str, size_type size)
 
    } else {
 
-      for (size_type i = 0; i < size; ++i) {
+      for (size_type i = 0; i < numOfChars; ++i) {
          const char32_t value = str[i];
          retval.append(value);
       }
@@ -349,72 +646,58 @@ QString8 QString8::fromLatin1(const char *str, size_type size)
 
 QString8 QString8::fromUtf8(const QByteArray &str)
 {
-   // broom ( test code only )
-   QString8 retval;
-
-   for (char c : str) {
-
-      if (c == 0) {
-         break;
-      }
-
-      retval.append(static_cast<char32_t>(c));
-   }
-
-   return retval;
+   return fromUtf8(str.constData(), str.size());
 }
 
-QString8 QString8::fromUtf8(const char *str, size_type size)
+QString8 QString8::fromUtf8(const char *str, size_type numOfChars)
+{
+   return CsString::CsString::fromUtf8(str, numOfChars);
+}
+
+QString8 QString8::fromUtf16(const char16_t *str, size_type numOfChars)
 {
    if (str == nullptr) {
       return QString8();
    }
 
-   if (size < 0) {
-      size = 0;
+   if (numOfChars < 0) {
+      numOfChars = 0;
 
-      while (str[size] != 0) {
-         ++size;
+      while (str[numOfChars] != 0) {
+         ++numOfChars;
       }
    }
 
-   // broom ( test code only )
+   // broom ( full implementation required )
    QString8 retval;
 
-   for (int i = 0; i < size; ++i) {
+   for (int i = 0; i < numOfChars; ++i) {
       retval.append(static_cast<char32_t>(str[i]));
    }
 
    return retval;
 }
 
-QString8 QString8::fromUtf16(const char16_t *str, size_type size)
+QString8::const_iterator QString8::indexOfFast(const QRegularExpression<QString8> &regExp, const_iterator from) const
 {
-   if (str == nullptr) {
-      return QString8();
+   QRegularExpressionMatch<QString8> match = regExp.match(*this, from);
+
+   if (match.hasMatch())  {
+      return match.capturedStart(0);
    }
 
-   if (size < 0) {
-      size = 0;
-
-      while (str[size] != 0) {
-         ++size;
-      }
-   }
-
-   // broom ( test code only )
-   QString8 retval;
-
-   for (int i = 0; i < size; ++i) {
-      retval.append(static_cast<char32_t>(str[i]));
-   }
-
-   return retval;
+   return end();
 }
 
-bool QString8::isEmpty() const
+QString8::const_iterator QString8::lastIndexOfFast(const QRegularExpression<QString8> &regExp, const_iterator from) const
 {
-   return empty();
+   QRegularExpressionMatch<QString8> match = regExp.rmatch(*this, from);
+
+   if (match.hasMatch())  {
+      return match.capturedStart(0);
+   }
+
+   return end();
 }
 
 bool QString8::isSimpleText() const
@@ -439,6 +722,21 @@ QString8 QString8::left(size_type numOfChars) const
    return QString8(substr(0, numOfChars));
 }
 
+QStringView8 QString8::leftView(size_type numOfChars) const
+{
+   if (numOfChars < 0) {
+      return QStringView8(cbegin(), cend());
+   }
+
+   const_iterator iter = cbegin();
+
+   for (size_type i = 0; i < numOfChars && iter != cend(); ++i)  {
+      ++iter;
+   }
+
+   return QStringView8(cbegin(), iter);
+}
+
 QString8 QString8::leftJustified(size_type width, QChar32 fill, bool truncate) const
 {
    QString8 retval;
@@ -461,9 +759,50 @@ QString8 QString8::leftJustified(size_type width, QChar32 fill, bool truncate) c
    return retval;
 }
 
-QString8 QString8::mid(size_type index, size_type numOfChars) const
+/*
+int localeAwareCompare(const QString8 &str) const
 {
-   return substr(index, numOfChars);
+   // not implemented
+}
+
+int localeAwareCompare(QStringView8 str) const
+{
+   // not imlemented
+}
+*/
+
+QString8 QString8::mid(size_type indexStart, size_type numOfChars) const
+{
+   return substr(indexStart, numOfChars);
+}
+
+QStringView8 QString8::midView(size_type indexStart, size_type numOfChars) const
+{
+   const_iterator iter_begin = cbegin();
+   const_iterator iter_end;
+
+   for (size_type i = 0; i < indexStart && iter_begin != cend(); ++i)  {
+      ++iter_begin;
+   }
+
+   if (iter_begin == cend()) {
+      // index > size()
+      return QStringView8();
+   }
+
+   if (numOfChars >= 0) {
+      iter_end = iter_begin;
+
+      for (size_type i = 0; i < numOfChars && iter_end != cend(); ++i)  {
+         ++iter_end;
+      }
+
+   } else {
+      iter_end = cend();
+
+   }
+
+   return QStringView8(iter_begin, iter_end);
 }
 
 QString8 QString8::normalized(QString8::NormalizationForm mode, QChar32::UnicodeVersion version) const
@@ -472,9 +811,9 @@ QString8 QString8::normalized(QString8::NormalizationForm mode, QChar32::Unicode
    return retval;
 }
 
-QString8 &QString8::remove(size_type indexStart, size_type size)
+QString8 &QString8::remove(size_type indexStart, size_type numOfChars)
 {
-   erase(indexStart, size);
+   erase(indexStart, numOfChars);
    return *this;
 }
 
@@ -559,7 +898,21 @@ QString8 QString8::repeated(size_type count) const
 
 QString8 &QString8::replace(const QString8 &before, const QString8 &after, Qt::CaseSensitivity cs)
 {
-   // broom - missing code
+   if (this->empty() || before.isEmpty()) {
+      return *this;
+   }
+
+   auto iter     = indexOfFast(before, begin(), cs);
+   size_type len = before.size();
+
+   while (iter != end()) {
+      auto last = iter + len;
+
+      iter = erase(iter, last);
+      iter = CsString::CsString::insert(iter, after);
+
+      iter = indexOfFast(before, iter, cs);
+   }
 
    return *this;
 }
@@ -571,23 +924,209 @@ QString8 &QString8::replace(const QChar32 *before, size_type beforeSize, const Q
       return *this;
    }
 
-   replace( QString8(before, beforeSize), QString8(after, afterSize), cs);
+   replace(QString8(before, beforeSize), QString8(after, afterSize), cs);
 
    return *this;
 }
 
 QString8 &QString8::replace(QChar32 before, QChar32 after, Qt::CaseSensitivity cs)
 {
+   auto first_iter = cbegin();
+   auto last_iter  = cend();
 
-   // broom - missing code
+   if (cs == Qt::CaseSensitive) {
+      auto iter = first_iter;
+
+      while (iter != last_iter) {
+
+         if (*iter == before) {
+           iter = replace(iter, after);
+            last_iter = cend();
+
+         } else {
+            ++iter;
+
+         }
+      }
+
+   } else {
+      QString8 str = before.toCaseFolded();
+
+      if (str.size() == 1 ) {
+         auto iter = first_iter;
+
+         while (iter != last_iter) {
+
+            if ( (*iter).toCaseFolded() == str) {
+               iter = replace(iter, after);
+               last_iter = cend();
+
+            } else {
+               ++iter;
+
+            }
+         }
+
+      } else {
+         remove(str, cs);
+
+      }
+   }
 
    return *this;
 }
 
 QString8 &QString8::replace(QChar32 c, const QString8 &after, Qt::CaseSensitivity cs)
 {
+   auto first_iter = cbegin();
+   auto last_iter  = cend();
 
-   // broom - missing code
+   if (cs == Qt::CaseSensitive) {
+      auto iter = first_iter;
+
+      while (iter != last_iter) {
+
+         if (*iter == c) {
+            iter = replace(iter, after);
+            last_iter = cend();
+
+         } else {
+            ++iter;
+
+         }
+      }
+
+   } else {
+      QString8 str = c.toCaseFolded();
+
+      if (str.size() == 1 ) {
+         auto iter = first_iter;
+
+         while (iter != last_iter) {
+
+            if ( (*iter).toCaseFolded() == str) {
+               iter = replace(iter, after);
+               last_iter = cend();
+
+            } else {
+               ++iter;
+
+            }
+         }
+
+      } else {
+         remove(str, cs);
+
+      }
+   }
+
+   return *this;
+}
+
+QString8 &QString8::replace(const QRegularExpression<QString8> &regExp, const QString8 &after)
+{
+   QRegularExpressionMatch<QString8> match = regExp.match(*this);
+   QRegularExpressionMatch<QString8> splitMatch;
+
+   static QRegularExpression<QString8> regSplit("(.*?)(\\\\[0-9])");
+   bool noCapture = true;
+
+   auto iter = after.indexOfFast('\\');
+
+   if (iter != after.end() && iter != end() - 1) {
+      splitMatch = regSplit.match(after);
+
+      if (splitMatch.hasMatch()) {
+         noCapture = false;
+      }
+   }
+
+   if (noCapture) {
+
+      while (match.hasMatch())  {
+         auto first = match.capturedStart(0);
+         auto last  = match.capturedEnd(0);
+
+         auto iter  = this->erase(first, last);
+         iter       = CsString::CsString::insert(iter, after);
+
+         match      = regExp.match(*this, iter);
+      }
+
+   } else {
+      // look for a 0-9
+      QVector<QStringView8> list;
+
+      QString8::const_iterator hold;
+
+      while (splitMatch.hasMatch())  {
+         list.append(splitMatch.capturedView(1));
+         list.append(splitMatch.capturedView(2));
+
+         hold = splitMatch.capturedEnd(0);
+
+         splitMatch = regSplit.match(after, splitMatch.capturedEnd(0));
+      }
+
+      if (hold != after.end()) {
+
+         // grab the rest of 'after'
+         list.append( QStringView8(hold, after.end()) );
+      }
+
+      std::array<QString8, 10> saveCapture;
+
+      while (match.hasMatch())  {
+         auto first = match.capturedStart(0);
+         auto last  = match.capturedEnd(0);
+
+         for (int x = 0; x < 10; ++x) {
+            saveCapture[x] = match.captured(x);
+         }
+
+         auto iter  = this->erase(first, last);
+
+         for (const auto &item : list) {
+
+            if (item == "\\0") {
+               iter = CsString::CsString::insert(iter, saveCapture[0]);
+
+            } else if (item == "\\1") {
+                  iter = CsString::CsString::insert(iter, saveCapture[1]);
+
+            } else if (item == "\\2") {
+                  iter = CsString::CsString::insert(iter, saveCapture[2]);
+
+            } else if (item == "\\3") {
+                  iter = CsString::CsString::insert(iter, saveCapture[3]);
+
+            } else if (item == "\\4") {
+                  iter = CsString::CsString::insert(iter, saveCapture[4]);
+
+            } else if (item == "\\5") {
+                  iter = CsString::CsString::insert(iter, saveCapture[5]);
+
+            } else if (item == "\\6") {
+                  iter = CsString::CsString::insert(iter, saveCapture[6]);
+
+            } else if (item == "\\7") {
+                  iter = CsString::CsString::insert(iter, saveCapture[7]);
+
+            } else if (item == "\\8") {
+                  iter = CsString::CsString::insert(iter, saveCapture[8]);
+
+            } else if (item == "\\9") {
+                  iter = CsString::CsString::insert(iter, saveCapture[9]);
+
+            } else {
+               iter = CsString::CsString::insert(iter, item);
+
+            }
+         }
+
+         match = regExp.match(*this, iter);
+      }
+   }
 
    return *this;
 }
@@ -601,6 +1140,21 @@ QString8 QString8::right(size_type numOfChars) const
    auto iter = cend() - numOfChars;
 
    return QString8(iter, cend());
+}
+
+QStringView8 QString8::rightView(size_type numOfChars) const
+{
+   if (numOfChars < 0) {
+      return QStringView8(cbegin(), cend());
+   }
+
+   const_iterator iter = cend();
+
+   for (size_type i = 0; i < numOfChars && iter != cbegin(); ++i)  {
+      --iter;
+   }
+
+   return QStringView8(iter, cend());
 }
 
 QString8 QString8::rightJustified(size_type width, QChar32 fill, bool truncate) const
@@ -738,39 +1292,6 @@ QString8 QString8::simplified() &&
    return retval;
 }
 
-//
-template <typename TRAITS, typename T>
-static T convertCase(const T &str)
-{
-   T retval;
-
-   for (auto c : str)  {
-      uint32_t value = c.unicode();
-
-      const QUnicodeTables::Properties *prop = QUnicodeTables::properties(value);
-      int32_t caseDiff = TRAITS::caseDiff(prop);
-
-      if (TRAITS::caseSpecial(prop)) {
-
-         const ushort *specialCase = QUnicodeTables::specialCaseMap + caseDiff;
-
-         ushort length = *specialCase;
-         ++specialCase;
-
-         for (ushort cnt; cnt < length; ++cnt)  {
-            retval += QChar32(specialCase[cnt]);
-         }
-
-
-      } else {
-         retval += QChar32( static_cast<char32_t>(value + caseDiff) );
-
-      }
-   }
-
-   return retval;
-}
-
 QString8 QString8::trimmed() const &
 {
    QString8 retval;
@@ -875,9 +1396,9 @@ bool QString8::startsWith(QChar32 c, Qt::CaseSensitivity cs) const
    }
 }
 
-bool QString8::startsWith(const QString8 &other, Qt::CaseSensitivity cs) const
+bool QString8::startsWith(const QString8 &str, Qt::CaseSensitivity cs) const
 {
-   if (other.empty()) {
+   if (str.empty()) {
       return true;
 
    } else if (empty()) {
@@ -888,7 +1409,7 @@ bool QString8::startsWith(const QString8 &other, Qt::CaseSensitivity cs) const
    if (cs == Qt::CaseSensitive) {
       auto iter = cbegin();
 
-      for (auto uc : other) {
+      for (auto uc : str) {
 
          if (iter == cend()) {
             return false;
@@ -906,7 +1427,55 @@ bool QString8::startsWith(const QString8 &other, Qt::CaseSensitivity cs) const
    } else {
       auto iter = cbegin();
 
-      for (auto uc : other) {
+      for (auto uc : str) {
+
+         if (iter == cend()) {
+            return false;
+         }
+
+         if ( iter->toCaseFolded() != uc.toCaseFolded()) {
+            return false;
+         }
+
+         ++iter;
+      }
+
+      return true;
+   }
+}
+
+bool QString8::startsWith(QStringView8 str, Qt::CaseSensitivity cs) const
+{
+   if (str.empty()) {
+      return true;
+
+   } else if (empty()) {
+      return false;
+
+   }
+
+   if (cs == Qt::CaseSensitive) {
+      auto iter = cbegin();
+
+      for (auto uc : str) {
+
+         if (iter == cend()) {
+            return false;
+         }
+
+         if (*iter != uc) {
+            return false;
+         }
+
+         ++iter;
+      }
+
+      return true;
+
+   } else {
+      auto iter = cbegin();
+
+      for (auto uc : str) {
 
          if (iter == cend()) {
             return false;
@@ -925,12 +1494,12 @@ bool QString8::startsWith(const QString8 &other, Qt::CaseSensitivity cs) const
 
 QString8 QString8::toCaseFolded() const &
 {
-    return convertCase<QUnicodeTables::CasefoldTraits>(*this);
+   return convertCase<QUnicodeTables::CasefoldTraits>(*this);
 }
 
 QString8 QString8::toCaseFolded() &&
 {
-    return convertCase<QUnicodeTables::CasefoldTraits>(*this);
+   return convertCase<QUnicodeTables::CasefoldTraits>(*this);
 }
 
 QString8 QString8::toHtmlEscaped() const
@@ -1005,7 +1574,7 @@ QByteArray QString8::toUtf8() const
 
 QByteArray QString8::toUtf16() const
 {
-   // broom - missing code
+   // broom ( full implementation required )
 
    return QByteArray();
 }
@@ -1017,25 +1586,26 @@ void QString8::truncate(size_type length)
    }
 }
 
-// operators
+// data stream
+QDataStream &operator>>(QDataStream &in, QString8 &str)
+{
+   char *tmp;
+   uint len;
 
-#if ! defined(QT_NO_DATASTREAM)
-   QDataStream &operator>>(QDataStream &out, QString8 &str)
-   {
-      // broom - not implemented
-      return out;
-   }
+   in.readBytes(tmp, len);
+   str = QString8::fromUtf8(tmp, len);
+   delete [] tmp;
 
-   QDataStream &operator<<(QDataStream &out, const QString8 &str)
-   {
-      // broom - not implemented
-      return out;
-   }
-#endif
+   return in;
+}
 
+QDataStream &operator<<(QDataStream &out, const QString8 &str)
+{
+   out.writeBytes(str.constData(), str.size_storage());
+   return out;
+}
 
 // normalization functions
-
 QString8 cs_internal_string_normalize(const QString8 &data, QString8::NormalizationForm mode,
                   QChar32::UnicodeVersion version, int from)
 {

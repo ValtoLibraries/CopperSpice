@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2017 Barbara Geller
-* Copyright (c) 2012-2017 Ansel Sermersheim
+* Copyright (c) 2012-2018 Barbara Geller
+* Copyright (c) 2012-2018 Ansel Sermersheim
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
 * Copyright (c) 2008-2012 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -40,8 +40,6 @@ static bool allowX11ColorNames = false;
 #include <math.h>
 #include <stdio.h>
 #include <limits.h>
-
-QT_BEGIN_NAMESPACE
 
 #define QCOLOR_INT_RANGE_CHECK(fn, var) \
     do { \
@@ -1509,21 +1507,8 @@ QDebug operator<<(QDebug dbg, const QColor &c)
    return dbg.space();
 }
 
-#ifndef QT_NO_DATASTREAM
-
 QDataStream &operator<<(QDataStream &stream, const QColor &color)
 {
-   if (stream.version() < 7) {
-      if (!color.isValid()) {
-         return stream << quint32(0x49000000);
-      }
-      quint32 p = (quint32)color.rgb();
-      if (stream.version() == 1) { // Swap red and blue
-         p = ((p << 16) & 0xff0000) | ((p >> 16) & 0xff) | (p & 0xff00ff00);
-      }
-      return stream << p;
-   }
-
    qint8   s = color.cspec;
    quint16 a = color.ct.argb.alpha;
    quint16 r = color.ct.argb.red;
@@ -1543,20 +1528,6 @@ QDataStream &operator<<(QDataStream &stream, const QColor &color)
 
 QDataStream &operator>>(QDataStream &stream, QColor &color)
 {
-   if (stream.version() < 7) {
-      quint32 p;
-      stream >> p;
-      if (p == 0x49000000) {
-         color.invalidate();
-         return stream;
-      }
-      if (stream.version() == 1) { // Swap red and blue
-         p = ((p << 16) & 0xff0000) | ((p >> 16) & 0xff) | (p & 0xff00ff00);
-      }
-      color.setRgb(p);
-      return stream;
-   }
-
    qint8 s;
    quint16 a, r, g, b, p;
    stream >> s;
@@ -1575,6 +1546,4 @@ QDataStream &operator>>(QDataStream &stream, QColor &color)
 
    return stream;
 }
-#endif // QT_NO_DATASTREAM
 
-QT_END_NAMESPACE
